@@ -1,0 +1,60 @@
+@startuml
+' BDD Billetterie - modèle entité-relation corrigé
+
+entity "evenement" as e {
+  * id_evenement : INT <<PK>>
+  --
+  nom : VARCHAR(200)
+  date_event : DATE
+  heure : TIME
+  lieu : VARCHAR(200)
+  capacite : INT
+  prix_base : DECIMAL(8,2)
+  description : TEXT
+}
+
+entity "client" as c {
+  * id_client : INT <<PK>>
+  --
+  prenom : VARCHAR(100)
+  nom : VARCHAR(100)
+  email : VARCHAR(150)
+  telephone : VARCHAR(30)
+  ville : VARCHAR(100)
+  date_creation : DATETIME
+}
+
+entity "statut_billet" as s {
+  * id_statut : INT <<PK>>
+  --
+  libelle : VARCHAR(50)
+}
+
+entity "billet" as b {
+  * id_billet : INT <<PK>>
+  --
+  code_unique : VARCHAR(100) <<UNIQUE>>
+  fk_client : INT <<FK>>
+  fk_evenement : INT <<FK>>
+  fk_statut : INT <<FK>>
+  date_achat : DATETIME
+  prix_paye : DECIMAL(8,2)
+}
+
+entity "paiement" as p {
+  * id_paiement : INT <<PK>>
+  --
+  fk_billet : INT <<FK>>
+  montant : DECIMAL(8,2)
+  mode_paiement : VARCHAR(50)
+  date_paiement : DATETIME
+  reference : VARCHAR(200)
+}
+
+' Relations
+e ||--o{ b : "possède"
+c ||--o{ b : "achète"
+s ||--o{ b : "a pour statut"
+b ||--o{ p : "lié à"
+
+@enduml

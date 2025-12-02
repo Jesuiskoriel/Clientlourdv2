@@ -1,0 +1,45 @@
+    <?xml version="1.0" encoding="UTF-8"?>
+
+    <?import javafx.scene.control.*?>
+    <?import javafx.scene.layout.*?>
+    <?import javafx.geometry.Insets?>
+
+    <VBox xmlns="http://javafx.com/javafx/11.0.1" 
+        xmlns:fx="http://javafx.com/fxml/1" 
+        fx:controller="controllers.ClientController"
+        spacing="15" style="-fx-padding: 20;">
+        
+        <Label text="Formulaire Client" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+        
+        <GridPane hgap="10" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="100"/>
+                <ColumnConstraints prefWidth="200"/>
+            </columnConstraints>
+            
+            <Label text="Nom*" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <TextField fx:id="nomField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+            
+            <Label text="Prénom*" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <TextField fx:id="prenomField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+            
+            <Label text="Email" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <TextField fx:id="emailField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+            
+            <Label text="Téléphone" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+            <TextField fx:id="telephoneField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+            
+            <Label text="Adresse" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+            <TextField fx:id="adresseField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        </GridPane>
+        
+        <HBox spacing="10">
+            <Button text="Créer" onAction="#handleCreateClient" 
+                    style="-fx-background-color: #2E8B57; -fx-text-fill: white;"/>
+            <Button text="Modifier" onAction="#handleUpdateClient" 
+                    style="-fx-background-color: #1E90FF; -fx-text-fill: white;"/>
+            <Button text="Supprimer" onAction="#handleDeleteClient" 
+                    style="-fx-background-color: #DC143C; -fx-text-fill: white;"/>
+            <Button text="Effacer" onAction="#handleClearForm"/>
+        </HBox>
+    </VBox>

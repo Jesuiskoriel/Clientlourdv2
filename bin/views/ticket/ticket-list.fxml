@@ -1,0 +1,49 @@
+    <?xml version="1.0" encoding="UTF-8"?>
+
+    <?import javafx.scene.control.*?>
+    <?import javafx.scene.layout.*?>
+
+    <BorderPane xmlns="http://javafx.com/javafx/11.0.1" 
+                xmlns:fx="http://javafx.com/fxml/1" 
+                fx:controller="controllers.TicketController">
+        
+        <top>
+            <VBox spacing="10" style="-fx-padding: 15;">
+                <Label text="Gestion des Tickets" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+                
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <TextField fx:id="searchField" promptText="Rechercher par client..." 
+                            HBox.hgrow="ALWAYS" onAction="#handleSearch"/>
+                    <Button text="Rechercher" onAction="#handleSearch"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Nouveau Ticket" onAction="#handleCreateTicket" 
+                            style="-fx-background-color: #2E8B57; -fx-text-fill: white;"/>
+                </HBox>
+            </VBox>
+        </top>
+        
+        <center>
+            <TableView fx:id="ticketTable" BorderPane.margin="10">
+                <columns>
+                    <TableColumn fx:id="eventColumn" text="Événement" prefWidth="200"/>
+                    <TableColumn fx:id="clientColumn" text="Client" prefWidth="200"/>
+                    <TableColumn fx:id="dateColumn" text="Date Achat" prefWidth="120"/>
+                    <TableColumn text="Prix" prefWidth="80">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="prix"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Statut" prefWidth="100">
+                        <cellValueFactory>
+                            <PropertyValueFactory property="statut"/>
+                        </cellValueFactory>
+                    </TableColumn>
+                    <TableColumn text="Actions" prefWidth="200">
+                        <cellFactory>
+                            <fx:include source="../action-buttons.fxml"/>
+                        </cellFactory>
+                    </TableColumn>
+                </columns>
+            </TableView>
+        </center>
+    </BorderPane>

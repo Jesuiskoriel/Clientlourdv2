@@ -4,13 +4,14 @@
     ],
     "java.project.outputPath": "bin",
     "java.project.referencedLibraries": [
-        "c:\\Users\\Jha'\\Desktop\\Clientlourd\\lib\\javafx.web.jar",
-        "c:\\Users\\Jha'\\Desktop\\Clientlourd\\lib\\javafx-swt.jar",
-        "c:\\Users\\Jha'\\Desktop\\Clientlourd\\lib\\javafx.controls.jar",
-        "c:\\Users\\Jha'\\Desktop\\Clientlourd\\lib\\javafx.swing.jar",
-        "c:\\Users\\Jha'\\Desktop\\Clientlourd\\lib\\javafx.media.jar",
-        "c:\\Users\\Jha'\\Desktop\\Clientlourd\\lib\\javafx.fxml.jar",
-        "c:\\Users\\Jha'\\Desktop\\Clientlourd\\lib\\javafx.graphics.jar",
-        "c:\\Users\\Jha'\\Desktop\\Clientlourd\\lib\\javafx.base.jar"
+        "lib/*/.jar",
+        "lib/javafx-swt.jar",
+        "lib/javafx.base.jar",
+        "lib/javafx.controls.jar",
+        "lib/javafx.fxml.jar",
+        "lib/javafx.graphics.jar",
+        "lib/javafx.media.jar",
+        "lib/javafx.swing.jar",
+        "lib/javafx.web.jar"
     ]
 }

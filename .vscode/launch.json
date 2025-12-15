@@ -9,15 +9,8 @@
             "name": "App",
             "request": "launch",
             "mainClass": "App",
-            "projectName": "Clientlourd_e914dc9a"
-        },
-        {
-            "type": "java",
-            "name": "App",
-            "request": "launch",
-            "mainClass": "App",
-            "projectName": "Clientlourd_52b8b486",
-            "vmArgs": "--module-path \"C:/Users/Jha'/Desktop/Clientlourd/lib\" --add-modules javafx.controls,javafx.fxml"
+            "projectName": "Clientlourdv2_d139e952",
+            "vmArgs": "--module-path \"/Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/lib\"  --enable-native-access=javafx.graphics --add-modules javafx.controls,javafx.fxml"
         }
     ]
 }

@@ -1,0 +1,14 @@
+# Build outputs
+out/
+*.class
+*.log
+
+# Virtual envs / local config
+.venv/
+.DS_Store
+
+# Generated assets
+posters/
+
+# JavaFX / local libs (avoid large binaries in git)
+lib/

@@ -1,60 +1,105 @@
 @startuml
-' BDD Billetterie - modèle entité-relation corrigé
+title Clientlourdv2 - ER Diagram (Full, simplified)
 
-entity "evenement" as e {
-  * id_evenement : INT <<PK>>
-  --
-  nom : VARCHAR(200)
-  date_event : DATE
-  heure : TIME
-  lieu : VARCHAR(200)
-  capacite : INT
-  prix_base : DECIMAL(8,2)
-  description : TEXT
+hide empty members
+left to right direction
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam roundcorner 8
+
+class utilisateur <<entity>> {
+  id_utilisateur : INT <<PK>>
+  nom_complet : VARCHAR
+  email : VARCHAR <<UNIQUE>>
+  telephone : VARCHAR
+  mot_de_passe : VARCHAR
+  solde : DECIMAL
+  is_admin : TINYINT
+  date_creation : TIMESTAMP
 }
 
-entity "client" as c {
-  * id_client : INT <<PK>>
-  --
-  prenom : VARCHAR(100)
-  nom : VARCHAR(100)
-  email : VARCHAR(150)
-  telephone : VARCHAR(30)
-  ville : VARCHAR(100)
+class security_question <<entity>> {
+  id : INT <<PK>>
+  libelle : VARCHAR
+}
+
+class security_answer <<entity>> {
+  user_id : INT <<FK>>
+  question_id : INT <<FK>>
+  answer_hash : VARCHAR
+  <<PK (user_id, question_id)>>
+}
+
+class otp_token <<entity>> {
+  user_id : INT <<PK, FK>>
+  code : VARCHAR
+  expires_at : TIMESTAMP
+}
+
+class client <<entity>> {
+  id_client : INT <<PK>>
+  prenom : VARCHAR
+  nom : VARCHAR
+  email : VARCHAR <<UNIQUE>>
+  telephone : VARCHAR
+  ville : VARCHAR
   date_creation : DATETIME
 }
 
-entity "statut_billet" as s {
-  * id_statut : INT <<PK>>
-  --
-  libelle : VARCHAR(50)
+class evenement <<entity>> {
+  id_evenement : INT <<PK>>
+  nom : VARCHAR
+  date_event : DATE
+  heure : TIME
+  lieu : VARCHAR
+  capacite : INT
+  prix_base : DECIMAL
+  description : TEXT
 }
 
-entity "billet" as b {
-  * id_billet : INT <<PK>>
-  --
-  code_unique : VARCHAR(100) <<UNIQUE>>
+class achat_utilisateur <<entity>> {
+  id_achat : INT <<PK>>
+  id_utilisateur : INT <<FK>>
+  id_evenement : INT <<FK>>
+  prix_achat : DECIMAL
+  date_achat : TIMESTAMP
+}
+
+class statut_billet <<entity>> {
+  id_statut : INT <<PK>>
+  libelle : VARCHAR
+}
+
+class billet <<entity>> {
+  id_billet : INT <<PK>>
+  code_unique : VARCHAR <<UNIQUE>>
   fk_client : INT <<FK>>
   fk_evenement : INT <<FK>>
   fk_statut : INT <<FK>>
   date_achat : DATETIME
-  prix_paye : DECIMAL(8,2)
+  prix_paye : DECIMAL
 }
 
-entity "paiement" as p {
-  * id_paiement : INT <<PK>>
-  --
+class paiement <<entity>> {
+  id_paiement : INT <<PK>>
   fk_billet : INT <<FK>>
-  montant : DECIMAL(8,2)
-  mode_paiement : VARCHAR(50)
+  montant : DECIMAL
+  mode_paiement : VARCHAR
   date_paiement : DATETIME
-  reference : VARCHAR(200)
+  reference : VARCHAR
 }
 
-' Relations
-e ||--o{ b : "possède"
-c ||--o{ b : "achète"
-s ||--o{ b : "a pour statut"
-b ||--o{ p : "lié à"
+utilisateur "1" -- "0..*" achat_utilisateur : achete
+evenement "1" -- "0..*" achat_utilisateur : concerne
+
+utilisateur "1" -- "0..*" security_answer : repond
+security_question "1" -- "0..*" security_answer : question
+
+utilisateur "1" -- "0..1" otp_token : otp
+
+client "1" -- "0..*" billet : possede
+evenement "1" -- "0..*" billet : concerne
+statut_billet "1" -- "0..*" billet : statut
+billet "1" -- "0..*" paiement : lie_a
 
 @enduml

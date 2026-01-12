@@ -219,7 +219,7 @@ Au démarrage, l’application affiche un écran d’accueil avec deux choix :
 
 - **Connexion** : ouvre le formulaire de login et charge l’interface principale après validation.
 - **Créer un compte** : formulaire avec nom, email, numéro et mot de passe (haché en SHA-256 via `PasswordUtils`) enregistré dans MySQL.
-- **Espace admin** : bouton en bas à droite qui préremplit la connexion avec l’administrateur (`jhawadlajimi@hotmail.com` / `lajimi04`) et ouvre l’interface de gestion complète.
+- **Espace admin** : bouton en bas à droite qui préremplit la connexion avec l’administrateur (`admin_email` / `admin_password`) et ouvre l’interface de gestion complète.
 
 Après inscription ou connexion en tant qu’utilisateur, l’application redirige automatiquement vers une boutique de billets (`store.fxml`) :
 

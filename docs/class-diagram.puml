@@ -1,0 +1,128 @@
+@startuml
+title Clientlourdv2 - Class Diagram
+
+left to right direction
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+
+package "App_UI" {
+  class App
+  class AuthController
+  class MainSceneController
+  class ClientController
+  class EventController
+  class TicketController
+  class StoreController
+  class UserAdminController
+}
+
+package "DAO_Database_Access" {
+  class UserDAO
+  class ClientDAO
+  class EvenementDAO
+  class BilletDAO
+  class AchatDAO
+  class StatutBilletDAO
+  class PaiementDAO
+  class SecurityDAO
+  class OtpToken
+}
+
+package "Models" {
+  class User
+  class Client
+  class Evenement
+  class Billet
+  class Achat
+  class StatutBillet
+  class Paiement
+  class SecurityQuestion
+}
+
+package "Utilities" {
+  class Database
+  class MailService
+  class PasswordUtils
+}
+
+SecurityDAO +-- OtpToken
+
+AuthController --> UserDAO
+AuthController --> ClientDAO
+AuthController --> SecurityDAO
+AuthController --> MailService
+AuthController --> PasswordUtils
+AuthController --> User
+AuthController --> Client
+AuthController --> SecurityQuestion
+
+MainSceneController ..> ClientController
+MainSceneController ..> EventController
+MainSceneController ..> TicketController
+MainSceneController ..> UserAdminController
+
+ClientController --> ClientDAO
+ClientController --> UserDAO
+ClientController --> BilletDAO
+ClientController --> AchatDAO
+ClientController --> Client
+ClientController --> User
+ClientController --> Billet
+ClientController --> Achat
+
+EventController --> EvenementDAO
+EventController --> Evenement
+
+TicketController --> BilletDAO
+TicketController --> StatutBilletDAO
+TicketController --> ClientDAO
+TicketController --> Billet
+TicketController --> StatutBillet
+TicketController --> Client
+TicketController --> Evenement
+
+StoreController --> EvenementDAO
+StoreController --> AchatDAO
+StoreController --> UserDAO
+StoreController --> Evenement
+StoreController --> Achat
+StoreController --> User
+
+UserAdminController --> UserDAO
+UserAdminController --> User
+
+UserDAO --> User
+ClientDAO --> Client
+EvenementDAO --> Evenement
+BilletDAO --> Billet
+BilletDAO --> Client
+BilletDAO --> Evenement
+BilletDAO --> StatutBillet
+AchatDAO --> Achat
+PaiementDAO --> Paiement
+StatutBilletDAO --> StatutBillet
+SecurityDAO --> SecurityQuestion
+
+UserDAO --> PasswordUtils
+
+UserDAO --> Database
+ClientDAO --> Database
+EvenementDAO --> Database
+BilletDAO --> Database
+AchatDAO --> Database
+PaiementDAO --> Database
+StatutBilletDAO --> Database
+SecurityDAO --> Database
+
+' Main cardinalities (domain)
+User "1" o-- "0..*" Achat : purchases
+Evenement "1" o-- "0..*" Achat : sold_for
+
+Client "1" o-- "0..*" Billet : owns
+Evenement "1" o-- "0..*" Billet : for_event
+StatutBillet "1" o-- "0..*" Billet : status
+
+User "1" o-- "0..1" OtpToken : otp
+SecurityQuestion "1" -- "0..*" User : answers
+@enduml

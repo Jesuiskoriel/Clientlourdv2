@@ -1,86 +1,181 @@
-    import java.sql.*;
-    import java.util.ArrayList;
-    import java.util.List;
+package dao;
 
-    public class ClientDAO {
+import model.Client;
+import utils.Database;
 
-        public List<Client> getAllClients() throws SQLException {
-            List<Client> clients = new ArrayList<>();
-            String sql = "SELECT * FROM client";
-            try (Connection conn = Database.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class ClientDAO {
+
+    private static final String BASE_SELECT = """
+            SELECT id_client, nom, prenom, email, telephone, ville, date_creation
+            FROM client
+            """;
+
+    public List<Client> findAll() {
+        List<Client> clients = new ArrayList<>();
+        try (
+            Connection conn = Database.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(BASE_SELECT + " ORDER BY nom, prenom")
+        ) {
+            while (rs.next()) {
+                clients.add(mapClient(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return clients;
+    }
+
+    public List<Client> searchByName(String term) {
+        List<Client> clients = new ArrayList<>();
+        String sql = BASE_SELECT + " WHERE nom LIKE ? OR prenom LIKE ? ORDER BY nom, prenom";
+
+        try (
+            Connection conn = Database.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            String wildcard = "%" + term + "%";
+            ps.setString(1, wildcard);
+            ps.setString(2, wildcard);
+
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Client c = new Client(
-                            rs.getInt("id_client"),
-                            rs.getString("prenom"),
-                            rs.getString("nom"),
-                            rs.getString("email"),
-                            rs.getString("telephone"),
-                            rs.getString("ville"),
-                            rs.getTimestamp("date_creation").toLocalDateTime()
-                    );
-                    clients.add(c);
+                    clients.add(mapClient(rs));
                 }
             }
-            return clients;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return clients;
+    }
 
-        public Client getClientById(int id) throws SQLException {
-            String sql = "SELECT * FROM client WHERE id_client = ?";
-            try (Connection conn = Database.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, id);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        return new Client(
-                                rs.getInt("id_client"),
-                                rs.getString("prenom"),
-                                rs.getString("nom"),
-                                rs.getString("email"),
-                                rs.getString("telephone"),
-                                rs.getString("ville"),
-                                rs.getTimestamp("date_creation").toLocalDateTime()
-                        );
+    public Optional<Client> findById(int id) {
+        String sql = BASE_SELECT + " WHERE id_client = ?";
+        try (
+            Connection conn = Database.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapClient(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Client> findByEmail(String email) {
+        String sql = BASE_SELECT + " WHERE email = ?";
+        try (
+            Connection conn = Database.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapClient(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+    public boolean create(Client client) {
+        String sql = """
+                INSERT INTO client (nom, prenom, email, telephone, ville)
+                VALUES (?, ?, ?, ?, ?)
+                """;
+        try (
+            Connection conn = Database.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        ) {
+            ps.setString(1, client.getNom());
+            ps.setString(2, client.getPrenom());
+            ps.setString(3, client.getEmail());
+            ps.setString(4, client.getTelephone());
+            ps.setString(5, client.getVille());
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        client.setId(keys.getInt(1));
+                        client.setDateCreation(LocalDateTime.now());
                     }
                 }
             }
-            return null;
+            return rows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        public void addClient(Client c) throws SQLException {
-            String sql = "INSERT INTO client (prenom, nom, email, telephone, ville) VALUES (?, ?, ?, ?, ?)";
-            try (Connection conn = Database.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, c.getPrenom());
-                ps.setString(2, c.getNom());
-                ps.setString(3, c.getEmail());
-                ps.setString(4, c.getTelephone());
-                ps.setString(5, c.getVille());
-                ps.executeUpdate();
-            }
-        }
-
-        public void updateClient(Client c) throws SQLException {
-            String sql = "UPDATE client SET prenom = ?, nom = ?, email = ?, telephone = ?, ville = ? WHERE id_client = ?";
-            try (Connection conn = Database.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, c.getPrenom());
-                ps.setString(2, c.getNom());
-                ps.setString(3, c.getEmail());
-                ps.setString(4, c.getTelephone());
-                ps.setString(5, c.getVille());
-                ps.setInt(6, c.getId());
-                ps.executeUpdate();
-            }
-        }
-
-        public void deleteClient(int id) throws SQLException {
-            String sql = "DELETE FROM client WHERE id_client = ?";
-            try (Connection conn = Database.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, id);
-                ps.executeUpdate();
-            }
-        }
+        return false;
     }
+
+    public boolean update(Client client) {
+        String sql = """
+                UPDATE client
+                SET nom = ?, prenom = ?, email = ?, telephone = ?, ville = ?
+                WHERE id_client = ?
+                """;
+        try (
+            Connection conn = Database.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setString(1, client.getNom());
+            ps.setString(2, client.getPrenom());
+            ps.setString(3, client.getEmail());
+            ps.setString(4, client.getTelephone());
+            ps.setString(5, client.getVille());
+            ps.setInt(6, client.getId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean delete(int id) {
+        String sql = "DELETE FROM client WHERE id_client = ?";
+        try (
+            Connection conn = Database.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private Client mapClient(ResultSet rs) throws SQLException {
+        Client client = new Client();
+        client.setId(rs.getInt("id_client"));
+        client.setNom(rs.getString("nom"));
+        client.setPrenom(rs.getString("prenom"));
+        client.setEmail(rs.getString("email"));
+        client.setTelephone(rs.getString("telephone"));
+        client.setVille(rs.getString("ville"));
+        Timestamp timestamp = rs.getTimestamp("date_creation");
+        if (timestamp != null) {
+            client.setDateCreation(timestamp.toLocalDateTime());
+        }
+        return client;
+    }
+}

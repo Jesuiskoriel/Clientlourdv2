@@ -1,47 +1,23 @@
+package utils;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
-import java.io.FileInputStream;
-import java.io.IOException;
 
-public class Database {
+/**
+ * Centralise la création des connexions JDBC.
+ */
+public final class Database {
 
-    private static String DB_HOST;
-    private static String DB_PORT;
-    private static String DB_NAME;
-    private static String DB_USER;
-    private static String DB_PASS;
+    private static final String URL = System.getenv()
+            .getOrDefault("DB_URL", "jdbc:mysql://localhost:3306/billeterie?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+    private static final String USER = System.getenv().getOrDefault("DB_USER", "root");
+    private static final String PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", "");
 
-    static {
-        try {
-            Properties props = new Properties();
-            FileInputStream fis = new FileInputStream("data.env"); 
-            props.load(fis);
-            DB_HOST = props.getProperty("DB_HOST");
-            DB_PORT = props.getProperty("DB_PORT");
-            DB_NAME = props.getProperty("DB_NAME");
-            DB_USER = props.getProperty("DB_USER");
-            DB_PASS = props.getProperty("DB_PASS");
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Erreur : impossible de charger le fichier .env");
-        }
+    private Database() {
     }
 
     public static Connection getConnection() throws SQLException {
-        String url = "jdbc:mysql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?useSSL=false&serverTimezone=UTC";
-        return DriverManager.getConnection(url, DB_USER, DB_PASS);
-    }
-
-
-    public static void main(String[] args) {
-        try (Connection conn = getConnection()) {
-            System.out.println("Connexion OK !");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }
-
-

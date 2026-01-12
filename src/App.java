@@ -12,17 +12,22 @@ public class App extends Application {
     public void start(Stage primaryStage) {
 
         try {
-            // 🔎 Vérification explicite du chemin du FXML
-            URL fxmlUrl = getClass().getResource("/views/main.fxml");
+            // Charge la première scène (écran d'authentification) depuis le FXML.
+            URL fxmlUrl = getClass().getResource("/views/auth/auth.fxml");
 
             if (fxmlUrl == null) {
-                throw new RuntimeException("Impossible de trouver /views/main.fxml");
+                throw new RuntimeException("Impossible de trouver /views/auth/auth.fxml");
             }
 
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
 
-            Scene scene = new Scene(root, 800, 600);
+            Scene scene = new Scene(root, 900, 600);
+            // Ajout de la feuille de style globale (thème).
+            URL css = getClass().getResource("/views/theme.css");
+            if (css != null) {
+                scene.getStylesheets().add(css.toExternalForm());
+            }
 
             primaryStage.setTitle("Système de Gestion de Billetterie");
             primaryStage.setScene(scene);

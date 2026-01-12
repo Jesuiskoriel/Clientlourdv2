@@ -1,194 +1,216 @@
 package controllers;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import dao.BilletDAO;
+import dao.ClientDAO;
+import dao.StatutBilletDAO;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import model.Ticket;
-import model.Event;
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
+import model.Billet;
 import model.Client;
-import Dao.TicketDAO;
-import Dao.EventDAO;
-import Dao.ClientDAO;
+import model.StatutBillet;
+
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TicketController {
-    
-    @FXML private TableView<Ticket> ticketTable;
-    @FXML private TableColumn<Ticket, String> eventColumn;
-    @FXML private TableColumn<Ticket, String> clientColumn;
-    @FXML private TableColumn<Ticket, String> dateColumn;
-    @FXML private ComboBox<Event> eventComboBox;
-    @FXML private ComboBox<Client> clientComboBox;
-    @FXML private TextField prixField;
-    @FXML private DatePicker dateAchatField;
-    @FXML private TextField searchField;
-    
-    private TicketDAO ticketDAO;
-    private EventDAO eventDAO;
-    private ClientDAO clientDAO;
-    private ObservableList<Ticket> ticketList;
-    private Ticket currentTicket;
-    
+
+    @FXML private TableView<Billet> ticketTable;
+    @FXML private TableColumn<Billet, String> codeColumn;
+    @FXML private TableColumn<Billet, String> clientColumn;
+    @FXML private TableColumn<Billet, String> eventColumn;
+    @FXML private TableColumn<Billet, String> statutColumn;
+    @FXML private TableColumn<Billet, String> dateColumn;
+    @FXML private TableColumn<Billet, Number> prixColumn;
+
+    @FXML private TextField filterField;
+    @FXML private TextField transferEmailField;
+    @FXML private ComboBox<StatutBillet> statutCombo;
+
+    private final BilletDAO billetDAO = new BilletDAO();
+    private final StatutBilletDAO statutBilletDAO = new StatutBilletDAO();
+    private final ClientDAO clientDAO = new ClientDAO();
+    private final ObservableList<Billet> billets = FXCollections.observableArrayList();
+    private final ObservableList<Billet> filteredBillets = FXCollections.observableArrayList();
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
     @FXML
     public void initialize() {
-        ticketDAO = new TicketDAO();
-        eventDAO = new EventDAO();
-        clientDAO = new ClientDAO();
-        
-        setupTableColumns();
-        loadComboboxData();
+        configureTable();
+        configureStatutCombo();
         loadTickets();
     }
-    
-    private void setupTableColumns() {
-        eventColumn.setCellValueFactory(cellData -> cellData.getValue().eventProperty());
-        clientColumn.setCellValueFactory(cellData -> cellData.getValue().clientProperty());
-        dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateAchatProperty());
-    }
-    
-    private void loadComboboxData() {
-        // Charger les événements
-        List<Event> events = eventDAO.findAll();
-        eventComboBox.setItems(FXCollections.observableArrayList(events));
-        
-        // Charger les clients
-        List<Client> clients = clientDAO.findAll();
-        clientComboBox.setItems(FXCollections.observableArrayList(clients));
-    }
-    
-    private void loadTickets() {
-        List<Ticket> tickets = ticketDAO.findAll();
-        ticketList = FXCollections.observableArrayList(tickets);
-        ticketTable.setItems(ticketList);
-    }
-    
-    @FXML
-    private void handleCreateTicket() {
-        if (validateForm()) {
-            Ticket ticket = new Ticket();
-            ticket.setEventId(eventComboBox.getValue().getId());
-            ticket.setClientId(clientComboBox.getValue().getId());
-            ticket.setPrix(Double.parseDouble(prixField.getText()));
-            ticket.setDateAchat(dateAchatField.getValue().toString());
-            
-            if (ticketDAO.create(ticket)) {
-                clearForm();
-                loadTickets();
-                showAlert("Succès", "Ticket créé avec succès", Alert.AlertType.INFORMATION);
+
+    private void configureTable() {
+        codeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCodeUnique()));
+        clientColumn.setCellValueFactory(data -> {
+            String label = data.getValue().getClient() != null
+                    ? data.getValue().getClient().getNom() + " " + data.getValue().getClient().getPrenom()
+                    : "";
+            return new SimpleStringProperty(label);
+        });
+        eventColumn.setCellValueFactory(data -> {
+            String label = data.getValue().getEvenement() != null
+                    ? data.getValue().getEvenement().getNom()
+                    : "";
+            return new SimpleStringProperty(label);
+        });
+        statutColumn.setCellValueFactory(data -> new SimpleStringProperty(
+                data.getValue().getStatut() != null ? data.getValue().getStatut().getLibelle() : ""
+        ));
+        dateColumn.setCellValueFactory(data -> {
+            if (data.getValue().getDateAchat() == null) {
+                return new SimpleStringProperty("");
             }
+            return new SimpleStringProperty(dateFormatter.format(data.getValue().getDateAchat()));
+        });
+        prixColumn.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getPrixPaye()));
+        ticketTable.setItems(filteredBillets);
+    }
+
+    private void configureStatutCombo() {
+        List<StatutBillet> statuts = statutBilletDAO.findAll();
+        statutCombo.setItems(FXCollections.observableArrayList(statuts));
+        statutCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(StatutBillet statutBillet) {
+                return statutBillet != null ? statutBillet.getLibelle() : "";
+            }
+
+            @Override
+            public StatutBillet fromString(String string) {
+                return statutCombo.getItems().stream()
+                        .filter(s -> s.getLibelle().equals(string))
+                        .findFirst()
+                        .orElse(null);
+            }
+        });
+    }
+
+    @FXML
+    private void handleRefresh() {
+        loadTickets();
+    }
+
+    @FXML
+    private void handleFilter() {
+        String term = filterField.getText();
+        if (term == null || term.isBlank()) {
+            filteredBillets.setAll(billets);
+            return;
+        }
+        String lower = term.toLowerCase();
+        filteredBillets.setAll(billets.stream()
+                .filter(b -> matchesFilter(b, lower))
+                .collect(Collectors.toList()));
+    }
+
+    @FXML
+    private void handleChangeStatut() {
+        Billet billet = ticketTable.getSelectionModel().getSelectedItem();
+        StatutBillet statut = statutCombo.getSelectionModel().getSelectedItem();
+        if (billet == null || statut == null) {
+            showAlert("Information", "Sélectionnez un billet et un statut.", Alert.AlertType.WARNING);
+            return;
+        }
+        if (billetDAO.updateStatut(billet.getId(), statut.getId())) {
+            billet.setStatut(statut);
+            ticketTable.refresh();
+            showAlert("Succès", "Statut mis à jour.", Alert.AlertType.INFORMATION);
         }
     }
-    
+
     @FXML
-    private void handleUpdateTicket() {
-        if (currentTicket != null && validateForm()) {
-            currentTicket.setEventId(eventComboBox.getValue().getId());
-            currentTicket.setClientId(clientComboBox.getValue().getId());
-            currentTicket.setPrix(Double.parseDouble(prixField.getText()));
-            currentTicket.setDateAchat(dateAchatField.getValue().toString());
-            
-            if (ticketDAO.update(currentTicket)) {
-                clearForm();
-                loadTickets();
-                showAlert("Succès", "Ticket modifié avec succès", Alert.AlertType.INFORMATION);
-            }
+    private void handleTransferTicket() {
+        Billet billet = ticketTable.getSelectionModel().getSelectedItem();
+        String email = transferEmailField != null ? transferEmailField.getText() : null;
+        if (billet == null) {
+            showAlert("Sélection requise", "Choisissez un billet à transférer.", Alert.AlertType.WARNING);
+            return;
         }
-    }
-    
-    @FXML
-    private void handleDeleteTicket() {
-        Ticket selected = ticketTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation");
-            alert.setHeaderText("Supprimer le ticket");
-            alert.setContentText("Êtes-vous sûr de vouloir supprimer ce ticket ?");
-            
-            if (alert.showAndWait().get() == ButtonType.OK) {
-                if (ticketDAO.delete(selected.getId())) {
-                    loadTickets();
-                    showAlert("Succès", "Ticket supprimé avec succès", Alert.AlertType.INFORMATION);
-                }
-            }
+        if (email == null || email.isBlank()) {
+            showAlert("Email manquant", "Renseignez l'email du client destinataire.", Alert.AlertType.WARNING);
+            return;
         }
-    }
-    
-    @FXML
-    private void handleSearch() {
-        String searchTerm = searchField.getText();
-        if (searchTerm.isEmpty()) {
-            loadTickets();
+        Optional<Client> clientOpt = clientDAO.findByEmail(email.trim());
+        if (clientOpt.isEmpty()) {
+            showAlert("Client introuvable", "Aucun client avec cet email.", Alert.AlertType.ERROR);
+            return;
+        }
+        Client client = clientOpt.get();
+        if (billetDAO.updateClient(billet.getId(), client.getId())) {
+            billet.setClient(client);
+            ticketTable.refresh();
+            transferEmailField.clear();
+            showAlert("Transfert confirmé", "Le billet a été associé à " + client.getNom() + " " + client.getPrenom(),
+                    Alert.AlertType.INFORMATION);
         } else {
-            List<Ticket> tickets = ticketDAO.findByClientName(searchTerm);
-            ticketList = FXCollections.observableArrayList(tickets);
-            ticketTable.setItems(ticketList);
+            showAlert("Erreur", "Impossible de transférer ce billet.", Alert.AlertType.ERROR);
         }
     }
-    
+
     @FXML
-    private void handleRowSelection() {
-        currentTicket = ticketTable.getSelectionModel().getSelectedItem();
-        if (currentTicket != null) {
-            populateForm(currentTicket);
+    private void handleRefundTicket() {
+        Billet billet = ticketTable.getSelectionModel().getSelectedItem();
+        if (billet == null) {
+            showAlert("Sélection requise", "Choisissez un billet à rembourser.", Alert.AlertType.WARNING);
+            return;
+        }
+        Optional<ButtonType> confirmation = new Alert(Alert.AlertType.CONFIRMATION,
+                "Confirmer le remboursement du billet " + billet.getCodeUnique() + " ?", ButtonType.OK, ButtonType.CANCEL)
+                .showAndWait();
+        if (confirmation.isEmpty() || confirmation.get() != ButtonType.OK) {
+            return;
+        }
+        if (billetDAO.delete(billet.getId())) {
+            billets.remove(billet);
+            filteredBillets.remove(billet);
+            ticketTable.refresh();
+            showAlert("Remboursement effectué", "Le billet a été supprimé.", Alert.AlertType.INFORMATION);
+        } else {
+            showAlert("Erreur", "Impossible de rembourser ce billet.", Alert.AlertType.ERROR);
         }
     }
-    
-    @FXML
-    private void handleClearForm() {
-        clearForm();
+
+    private void loadTickets() {
+        billets.setAll(billetDAO.findAll());
+        filteredBillets.setAll(billets);
     }
-    
-    private void populateForm(Ticket ticket) {
-        
-        Event event = eventDAO.findById(ticket.getEventId());
-        if (event != null) {
-            eventComboBox.setValue(event);
+
+    private boolean matchesFilter(Billet billet, String term) {
+        if (billet.getClient() != null) {
+            if (billet.getClient().getNom() != null
+                    && billet.getClient().getNom().toLowerCase().contains(term)) {
+                return true;
+            }
+            if (billet.getClient().getPrenom() != null
+                    && billet.getClient().getPrenom().toLowerCase().contains(term)) {
+                return true;
+            }
         }
-        
-        
-        Client client = clientDAO.findById(ticket.getClientId());
-        if (client != null) {
-            clientComboBox.setValue(client);
+        if (billet.getEvenement() != null && billet.getEvenement().getNom() != null
+                && billet.getEvenement().getNom().toLowerCase().contains(term)) {
+            return true;
         }
-        
-        prixField.setText(String.valueOf(ticket.getPrix()));
-        
+        return billet.getCodeUnique() != null && billet.getCodeUnique().toLowerCase().contains(term);
     }
-    
-    private void clearForm() {
-        eventComboBox.setValue(null);
-        clientComboBox.setValue(null);
-        prixField.clear();
-        dateAchatField.setValue(null);
-        currentTicket = null;
-    }
-    
-    private boolean validateForm() {
-        if (eventComboBox.getValue() == null || 
-            clientComboBox.getValue() == null || 
-            prixField.getText().isEmpty() ||
-            dateAchatField.getValue() == null) {
-            
-            showAlert("Erreur", "Tous les champs doivent être remplis", Alert.AlertType.ERROR);
-            return false;
-        }
-        
-        try {
-            Double.parseDouble(prixField.getText());
-        } catch (NumberFormatException e) {
-            showAlert("Erreur", "Le prix doit être un nombre valide", Alert.AlertType.ERROR);
-            return false;
-        }
-        
-        return true;
-    }
-    
-    private void showAlert(String title, String message, Alert.AlertType type) {
+
+    private void showAlert(String title, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(message);
+        alert.setContentText(content);
         alert.showAndWait();
     }
 }

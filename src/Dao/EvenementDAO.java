@@ -16,25 +16,12 @@ import java.util.Optional;
 
 public class EvenementDAO {
 
-    private static final String BASE_SELECT = """
-            SELECT
-                id_evenement,
-                nom,
-                COALESCE(date_event, date_evenement) AS date_event,
-                heure,
-                lieu,
-                COALESCE(capacite, 0) AS capacite,
-                COALESCE(prix_base, prix, 0) AS prix_base,
-                description
-            FROM evenement
-            """;
-
     public List<Evenement> findAll() {
         List<Evenement> evenements = new ArrayList<>();
         try (
             Connection conn = Database.getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(BASE_SELECT + " ORDER BY date_event")
+            ResultSet rs = stmt.executeQuery(buildSelect(conn) + " ORDER BY date_event")
         ) {
             while (rs.next()) {
                 evenements.add(mapEvent(rs));
@@ -46,10 +33,9 @@ public class EvenementDAO {
     }
 
     public Optional<Evenement> findById(int id) {
-        String sql = BASE_SELECT + " WHERE id_evenement = ?";
         try (
             Connection conn = Database.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
+            PreparedStatement ps = conn.prepareStatement(buildSelect(conn) + " WHERE id_evenement = ?")
         ) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
@@ -145,5 +131,57 @@ public class EvenementDAO {
         event.setPrixBase(rs.getDouble("prix_base"));
         event.setDescription(rs.getString("description"));
         return event;
+    }
+
+    private String buildSelect(Connection conn) throws SQLException {
+        String dateExpr = pickColumn(conn, "evenement", "date_event", "date_evenement", "NULL");
+        String prixExpr = pickColumn(conn, "evenement", "prix_base", "prix", "0");
+        String heureExpr = pickColumn(conn, "evenement", "heure", null, "NULL");
+        String capaciteExpr = pickColumn(conn, "evenement", "capacite", null, "0");
+        String lieuExpr = pickColumn(conn, "evenement", "lieu", null, "NULL");
+        String descriptionExpr = pickColumn(conn, "evenement", "description", null, "NULL");
+        return """
+                SELECT
+                    id_evenement,
+                    nom,
+                    %s AS date_event,
+                    %s AS heure,
+                    %s AS lieu,
+                    %s AS capacite,
+                    %s AS prix_base,
+                    %s AS description
+                FROM evenement
+                """.formatted(dateExpr, heureExpr, lieuExpr, capaciteExpr, prixExpr, descriptionExpr);
+    }
+
+    private String pickColumn(Connection conn, String table, String primary, String fallback, String defaultLiteral)
+            throws SQLException {
+        String primaryResolved = resolveColumn(conn, table, primary);
+        if (primaryResolved != null) {
+            return primaryResolved;
+        }
+        if (fallback != null) {
+            String fallbackResolved = resolveColumn(conn, table, fallback);
+            if (fallbackResolved != null) {
+                return fallbackResolved;
+            }
+        }
+        return defaultLiteral;
+    }
+
+    private String resolveColumn(Connection conn, String table, String column) throws SQLException {
+        if (column == null) {
+            return null;
+        }
+        String catalog = conn.getCatalog();
+        try (ResultSet rs = conn.getMetaData().getColumns(catalog, null, table, null)) {
+            while (rs.next()) {
+                String name = rs.getString("COLUMN_NAME");
+                if (name != null && name.equalsIgnoreCase(column)) {
+                    return name;
+                }
+            }
+        }
+        return null;
     }
 }

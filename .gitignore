@@ -12,3 +12,4 @@ posters/
 
 # JavaFX / local libs (avoid large binaries in git)
 lib/
+lib/

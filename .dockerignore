@@ -1,0 +1,14 @@
+.DS_Store
+.git
+.gitignore
+.vscode
+.venv
+lib
+out
+target
+basededonnees
+docs
+modélisation
+posters
+data.sql
+README.md

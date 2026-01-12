@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: clientlourd-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: billeterie
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./basededonnees/data.sql:/docker-entrypoint-initdb.d/01-base.sql:ro
+      - ./docker/init-auth.sql:/docker-entrypoint-initdb.d/02-auth.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - clientlourd-net
+
+  app:
+    build: .
+    container_name: clientlourd-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/billeterie?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_WAIT: "1"
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_STARTTLS: ${SMTP_STARTTLS}
+      SMTP_SSL: ${SMTP_SSL}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_TIMEOUT_MS: ${SMTP_TIMEOUT_MS}
+    ports:
+      - "6080:6080"
+    networks:
+      - clientlourd-net
+
+volumes:
+  mysql_data:
+
+networks:
+  clientlourd-net:

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.MainSceneController"
+            style="-fx-background-color: transparent;">
+
+    <top>
+        <VBox>
+            <MenuBar>
+                <Menu text="Fichier">
+                    <MenuItem text="Quitter" onAction="#handleQuit"/>
+                </Menu>
+                <Menu text="Gestion">
+                    <MenuItem text="Clients" onAction="#handleShowClients"/>
+                    <MenuItem text="Événements" onAction="#handleShowEvents"/>
+                    <MenuItem text="Billets" onAction="#handleShowTickets"/>
+                    <MenuItem text="Comptes" onAction="#handleShowAccounts"/>
+                </Menu>
+            </MenuBar>
+            <VBox styleClass="banner">
+                <Label text="Tableau de bord billetterie"
+                       style="-fx-font-size: 22; -fx-font-weight: bold;"/>
+                <Label text="Pilote clients, événements et billets depuis un seul espace."/>
+            </VBox>
+        </VBox>
+    </top>
+
+    <left>
+        <VBox spacing="12" styleClass="nav-rail">
+            <Label text="Navigation" styleClass="nav-title"/>
+            <Button text="Clients" maxWidth="Infinity" onAction="#handleShowClients"/>
+            <Button text="Événements" maxWidth="Infinity" onAction="#handleShowEvents"/>
+            <Button text="Billets" maxWidth="Infinity" onAction="#handleShowTickets"/>
+            <Button text="Comptes" maxWidth="Infinity" onAction="#handleShowAccounts"/>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane style="-fx-padding: 20;">
+            <Label text="Chargement..."
+                   style="-fx-font-size: 18; -fx-text-fill: #888;"/>
+        </StackPane>
+    </center>
+
+    <bottom>
+        <Label fx:id="statusLabel"
+               text="Prêt"
+               BorderPane.alignment="CENTER_LEFT"
+               style="-fx-padding: 8 12 8 12; -fx-background-color: #f1f3f5;"
+               styleClass="border-pane-status"/>
+    </bottom>
+
+</BorderPane>

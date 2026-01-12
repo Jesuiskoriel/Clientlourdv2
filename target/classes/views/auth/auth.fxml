@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.AuthController">
+
+    <left>
+        <VBox spacing="18" style="-fx-padding: 48; -fx-background-color: linear-gradient(to bottom right, #1b1f3b, #28365b, #0f172a);">
+            <Label text="Billetterie ✨"
+                   style="-fx-text-fill: white; -fx-font-size: 30; -fx-font-weight: bold;"/>
+            <Label text="Votre scène numérique pour créer, vendre et gérer vos spectacles."
+                   wrapText="true"
+                   style="-fx-text-fill: rgba(255,255,255,0.85); -fx-font-size: 14;"/>
+            <VBox spacing="8" style="-fx-background-color: rgba(255,255,255,0.08); -fx-padding: 12; -fx-background-radius: 10;">
+                <Label text="🎭 Programmation maîtrisée" style="-fx-text-fill: white;"/>
+                <Label text="🎟️ Billets &amp; QR en un clic" style="-fx-text-fill: white;"/>
+                <Label text="💳 Paiements &amp; soldes suivis" style="-fx-text-fill: white;"/>
+            </VBox>
+            <Label text="Connectez-vous ou créez un compte pour continuer."
+                   wrapText="true"
+                   style="-fx-text-fill: rgba(255,255,255,0.75);"/>
+        </VBox>
+    </left>
+
+    <center>
+        <StackPane fx:id="contentStack" style="-fx-padding: 40;">
+            <VBox fx:id="landingPane" spacing="18" maxWidth="380"
+                  style="-fx-padding: 34; -fx-background-color: white; -fx-background-radius: 16; -fx-border-color: #e9ecef; -fx-border-radius: 16; -fx-effect: dropshadow(gaussian, rgba(16,24,40,0.12), 16, 0.2, 0, 6);">
+                <Label text="Bienvenue 👋" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #1f2d3d;"/>
+                <Label text="Accédez à votre espace pour gérer vos spectacles et ventes en toute simplicité."
+                       wrapText="true" style="-fx-text-fill: #556677;"/>
+                <VBox spacing="10">
+                    <Button text="Connexion" maxWidth="Infinity" onAction="#handleShowLogin"
+                            style="-fx-background-color: linear-gradient(to right, #4c6ef5, #4263eb); -fx-text-fill: white; -fx-font-size: 15; -fx-background-radius: 10;"/>
+                    <Button text="Créer un compte" maxWidth="Infinity" onAction="#handleShowRegister"
+                            style="-fx-background-color: linear-gradient(to right, #40c057, #2f9e44); -fx-text-fill: white; -fx-font-size: 15; -fx-background-radius: 10;"/>
+                    <Button text="Mot de passe oublié ?" maxWidth="Infinity" onAction="#handleShowReset"
+                            style="-fx-background-color: transparent; -fx-text-fill: #364fc7;"/>
+                </VBox>
+            </VBox>
+
+            <VBox fx:id="loginPane" spacing="15" maxWidth="360" visible="false" managed="false"
+                  style="-fx-padding: 30; -fx-background-color: white; -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);">
+                <Label text="Connexion" style="-fx-font-size: 22; -fx-font-weight: bold;"/>
+                <TextField fx:id="loginEmailField" promptText="Email" />
+                <PasswordField fx:id="loginPasswordField" promptText="Mot de passe"/>
+                <Button text="Se connecter" maxWidth="Infinity" onAction="#handleSubmitLogin"
+                        style="-fx-background-color: #1971c2; -fx-text-fill: white;"/>
+                <HBox spacing="10" alignment="CENTER">
+                    <Button text="Retour" onAction="#handleShowLanding"/>
+                    <Button text="Créer un compte" onAction="#handleShowRegister"/>
+                </HBox>
+                <Button text="Mot de passe oublié ?" onAction="#handleShowReset"
+                        style="-fx-background-color: transparent; -fx-text-fill: #1971c2; -fx-underline: true;"/>
+            </VBox>
+
+            <VBox fx:id="registerPane" spacing="15" maxWidth="420" visible="false" managed="false"
+                  style="-fx-padding: 30; -fx-background-color: white; -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);">
+                <Label text="Créer un compte" style="-fx-font-size: 22; -fx-font-weight: bold;"/>
+                <TextField fx:id="registerNameField" promptText="Nom complet"/>
+                <TextField fx:id="registerEmailField" promptText="Email professionnel"/>
+                <TextField fx:id="registerPhoneField" promptText="Numéro de téléphone"/>
+                <PasswordField fx:id="registerPasswordField" promptText="Mot de passe"/>
+                <PasswordField fx:id="registerConfirmField" promptText="Confirmer le mot de passe"/>
+                <Label text="Questions de sécurité (choisissez-en 3)" />
+                <VBox spacing="8">
+                    <HBox spacing="8">
+                        <ComboBox fx:id="question1Combo" promptText="Question 1" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="answer1Field" promptText="Votre réponse" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                    <HBox spacing="8">
+                        <ComboBox fx:id="question2Combo" promptText="Question 2" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="answer2Field" promptText="Votre réponse" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                    <HBox spacing="8">
+                        <ComboBox fx:id="question3Combo" promptText="Question 3" HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="answer3Field" promptText="Votre réponse" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                </VBox>
+                <Button text="Enregistrer" maxWidth="Infinity" onAction="#handleSubmitRegister"
+                        style="-fx-background-color: #40c057; -fx-text-fill: white;"/>
+                <HBox spacing="10" alignment="CENTER">
+                    <Button text="Retour" onAction="#handleShowLanding"/>
+                    <Button text="Déjà un compte ?" onAction="#handleShowLogin"/>
+                </HBox>
+            </VBox>
+
+            <VBox fx:id="otpPane" spacing="12" maxWidth="360" visible="false" managed="false"
+                  style="-fx-padding: 30; -fx-background-color: white; -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);">
+                <Label text="Vérification en 2 étapes" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+                <Label fx:id="otpInfoLabel" wrapText="true"
+                       text="Un code vous a été envoyé par email. Saisissez-le pour continuer."/>
+                <TextField fx:id="otpCodeField" promptText="Code reçu"/>
+                <Button text="Valider le code" maxWidth="Infinity" onAction="#handleValidateOtp"
+                        style="-fx-background-color: #1971c2; -fx-text-fill: white;"/>
+                <Button text="Renvoyer un code" maxWidth="Infinity" onAction="#handleResendOtp"
+                        style="-fx-background-color: transparent; -fx-text-fill: #1971c2;"/>
+                <Button text="Annuler" onAction="#handleShowLogin"/>
+            </VBox>
+
+            <VBox fx:id="resetPane" spacing="12" maxWidth="420" visible="false" managed="false"
+                  style="-fx-padding: 30; -fx-background-color: white; -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 6);">
+                <Label text="Réinitialiser le mot de passe" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+                <TextField fx:id="resetEmailField" promptText="Votre email"/>
+                <Button text="Charger mes questions" onAction="#handleLoadResetQuestions"
+                        style="-fx-background-color: #1971c2; -fx-text-fill: white;"/>
+                <Label fx:id="resetOtpInfoLabel" text="Un code vous sera envoyé par email." wrapText="true"/>
+                <Label text="Répondez aux 3 questions enregistrées" />
+                <Label fx:id="resetQuestion1Label" wrapText="true"/>
+                <TextField fx:id="resetAnswer1Field" promptText="Réponse 1"/>
+                <Label fx:id="resetQuestion2Label" wrapText="true"/>
+                <TextField fx:id="resetAnswer2Field" promptText="Réponse 2"/>
+                <Label fx:id="resetQuestion3Label" wrapText="true"/>
+                <TextField fx:id="resetAnswer3Field" promptText="Réponse 3"/>
+                <TextField fx:id="resetOtpField" promptText="Code OTP reçu par email"/>
+                <PasswordField fx:id="resetNewPasswordField" promptText="Nouveau mot de passe"/>
+                <PasswordField fx:id="resetConfirmField" promptText="Confirmer le mot de passe"/>
+                <Button text="Valider la réinitialisation" onAction="#handleSubmitReset"
+                        style="-fx-background-color: #40c057; -fx-text-fill: white;"/>
+                <Button text="Retour" onAction="#handleShowLogin"/>
+            </VBox>
+        </StackPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10 20 20 20;">
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Button text="Espace admin" onAction="#handleAdminShortcut"
+                    style="-fx-background-color: transparent; -fx-border-color: #1971c2; -fx-text-fill: #1971c2;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

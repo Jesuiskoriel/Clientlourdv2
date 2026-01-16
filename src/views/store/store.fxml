@@ -18,6 +18,7 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controllers.StoreController">
 
+    <!-- Barre supérieure: accueil + solde + logout -->
     <top>
         <HBox spacing="20" style="-fx-padding: 15; -fx-background-color: #212529;">
             <Label fx:id="welcomeLabel"
@@ -29,6 +30,7 @@
         </HBox>
     </top>
 
+    <!-- Catalogue d'événements et achat -->
     <center>
         <VBox spacing="12" style="-fx-padding: 20; -fx-background-color: rgba(255,255,255,0.8);">
             <Label text="Billets disponibles 🎟️" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #1f2d3d;"/>
@@ -55,6 +57,7 @@
         </VBox>
     </center>
 
+    <!-- Panneau latéral: achats + QR -->
     <right>
         <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: #f8f9fa;" prefWidth="320">
             <Label text="Mes billets 🎫" style="-fx-font-weight: bold;"/>

@@ -15,8 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// Accès aux données pour la table utilisateur.
 public class UserDAO {
 
+    // Vérifie si un email existe déjà en base.
     public boolean emailExists(String email) {
         String sql = "SELECT 1 FROM utilisateur WHERE email = ?";
         try (
@@ -33,6 +35,7 @@ public class UserDAO {
         return false;
     }
 
+    // Crée un utilisateur et remplit son id.
     public boolean create(User user) {
         String sql = """
                 INSERT INTO utilisateur (prenom, nom, nom_complet, email, telephone, mot_de_passe, solde, is_admin)
@@ -66,6 +69,7 @@ public class UserDAO {
         return false;
     }
 
+    // Recherche un utilisateur par email.
     public Optional<User> findByEmail(String email) {
         String sql = """
                 SELECT id_utilisateur, prenom, nom, nom_complet, email, telephone, mot_de_passe, date_creation, solde, is_admin
@@ -88,6 +92,7 @@ public class UserDAO {
         return Optional.empty();
     }
 
+    // Authentifie via email + mot de passe.
     public Optional<User> authenticate(String email, String password) {
         Optional<User> userOpt = findByEmail(email);
         if (userOpt.isPresent()) {
@@ -99,6 +104,7 @@ public class UserDAO {
         return Optional.empty();
     }
 
+    // Retourne tous les utilisateurs pour l'admin.
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
         String sql = """
@@ -118,6 +124,7 @@ public class UserDAO {
         return users;
     }
 
+    // Supprime un utilisateur et ses dépendances.
     public boolean deleteUser(int userId) {
         // Supprime d'abord les dépendances (réponses sécurité, OTP, achats) puis l'utilisateur.
         String deleteSecurityAnswers = "DELETE FROM security_answer WHERE user_id = ?";
@@ -153,6 +160,7 @@ public class UserDAO {
         return false;
     }
 
+    // Transforme un ResultSet en objet User.
     private User mapUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setId(rs.getInt("id_utilisateur"));
@@ -177,6 +185,7 @@ public class UserDAO {
         return user;
     }
 
+    // Met à jour le solde d'un utilisateur.
     public boolean updateSolde(int userId, double newSolde) {
         String sql = "UPDATE utilisateur SET solde = ? WHERE id_utilisateur = ?";
         try (
@@ -192,6 +201,7 @@ public class UserDAO {
         return false;
     }
 
+    // Remplace le mot de passe hashé.
     public boolean updatePassword(int userId, String hashed) {
         String sql = "UPDATE utilisateur SET mot_de_passe = ? WHERE id_utilisateur = ?";
         try (
@@ -207,6 +217,7 @@ public class UserDAO {
         return false;
     }
 
+    // Découpe un nom complet pour remplir prenom/nom.
     private String[] splitNames(String fullName) {
         String value = fullName != null ? fullName.trim() : "";
         if (value.isEmpty()) {

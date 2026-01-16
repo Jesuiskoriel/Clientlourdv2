@@ -53,6 +53,7 @@ import java.time.LocalTime;
 import javafx.util.Duration;
 import javax.imageio.ImageIO;
 
+// Contrôleur de la boutique utilisateur (achat de billets + solde).
 public class StoreController {
 
     @FXML private Label welcomeLabel;
@@ -78,11 +79,13 @@ public class StoreController {
     private Evenement selectedEvent;
     private VBox selectedCard;
 
+    // Prépare la table des achats.
     @FXML
     public void initialize() {
         configureTables();
     }
 
+    // Injecte l'utilisateur connecté et charge ses données.
     public void setUser(User user) {
         this.currentUser = user;
         welcomeLabel.setText("Bonjour " + user.getNomComplet());
@@ -91,6 +94,7 @@ public class StoreController {
         loadPurchases();
     }
 
+    // Configure les colonnes de la table des achats.
     private void configureTables() {
         purchaseEventColumn.setCellValueFactory(new PropertyValueFactory<>("eventName"));
         purchasePriceColumn.setCellValueFactory(new PropertyValueFactory<>("prix"));
@@ -111,17 +115,20 @@ public class StoreController {
         });
     }
 
+    // Charge les événements et génère les cartes.
     private void loadEvents() {
         events.setAll(evenementDAO.findAll());
         renderEventCards();
     }
 
+    // Charge les achats de l'utilisateur.
     private void loadPurchases() {
         if (currentUser != null) {
             achats.setAll(achatDAO.findByUser(currentUser.getId()));
         }
     }
 
+    // Achète un billet pour l'événement sélectionné.
     @FXML
     private void handleBuyTicket() {
         if (currentUser == null) {
@@ -153,6 +160,7 @@ public class StoreController {
         }
     }
 
+    // Affiche le QR du billet sélectionné.
     @FXML
     private void handleShowTicketQr() {
         Achat achat = purchaseTable.getSelectionModel().getSelectedItem();
@@ -163,6 +171,7 @@ public class StoreController {
         showTicketQr(achat);
     }
 
+    // Démarre une recharge de solde.
     @FXML
     private void handleAddFunds() {
         if (currentUser == null) {
@@ -183,6 +192,7 @@ public class StoreController {
         showCardPaymentDialog(amount);
     }
 
+    // Déconnecte l'utilisateur et revient à l'auth.
     @FXML
     private void handleLogout() {
         try {
@@ -202,10 +212,12 @@ public class StoreController {
         }
     }
 
+    // Met à jour l'affichage du solde.
     private void updateBalanceLabel() {
         balanceLabel.setText(String.format("Solde : %.2f €", currentUser.getSolde()));
     }
 
+    // Calcule les places restantes pour un événement.
     private int getPlacesRestantes(Evenement event) {
         if (event == null) {
             return 0;
@@ -215,6 +227,7 @@ public class StoreController {
         return Math.max(restantes, 0);
     }
 
+    // Génère les cartes d'événements dans la grille.
     private void renderEventCards() {
         if (eventGrid == null) {
             return;
@@ -226,6 +239,7 @@ public class StoreController {
         }
     }
 
+    // Crée une carte visuelle pour un événement.
     private VBox createEventCard(Evenement event) {
         ImageView poster = new ImageView(getPosterImage(event));
         poster.setFitWidth(180);
@@ -273,6 +287,7 @@ public class StoreController {
         return card;
     }
 
+    // Marque une carte comme sélectionnée.
     private void setSelectedEvent(Evenement event, VBox card) {
         this.selectedEvent = event;
         if (selectedCard != null) {
@@ -283,6 +298,7 @@ public class StoreController {
         feedbackLabel.setText("Sélectionné : " + eventTitle(event));
     }
 
+    // Récupère ou génère l'image d'affiche de l'événement.
     private Image getPosterImage(Evenement event) {
         File posterDir = new File(System.getProperty("user.dir"), "posters");
         if (!posterDir.exists()) {
@@ -302,6 +318,7 @@ public class StoreController {
         return generated;
     }
 
+    // Génère une affiche graphique (gradient + texte).
     private Image createPosterImage(Evenement event) {
         int width = 360;
         int height = 520;
@@ -339,6 +356,7 @@ public class StoreController {
         return snapshot;
     }
 
+    // Écrit un texte multi-lignes dans l'affiche.
     private void wrapText(GraphicsContext gc, String text, int maxLines, double maxWidth, double x, double y) {
         if (text == null) return;
         String[] words = text.split("\\s+");
@@ -362,12 +380,14 @@ public class StoreController {
         }
     }
 
+    // Calcule la largeur d'un texte pour le wrapping.
     private double computeWidth(String value, Font font) {
         Text t = new Text(value);
         t.setFont(font);
         return t.getLayoutBounds().getWidth();
     }
 
+    // Formate une date/heure en une ligne lisible.
     private String formatDate(LocalDate date, LocalTime time) {
         String dateStr = date != null ? date.toString() : "";
         if (time != null) {
@@ -376,6 +396,7 @@ public class StoreController {
         return dateStr.trim();
     }
 
+    // Construit un titre affichable pour la carte.
     private String eventTitle(Evenement event) {
         String title = event != null && event.getNom() != null && !event.getNom().isBlank()
                 ? event.getNom()
@@ -383,6 +404,7 @@ public class StoreController {
         return "🎭 " + title;
     }
 
+    // Ouvre une fenêtre avec un QR (factice) du billet.
     private void showTicketQr(Achat achat) {
         String code = buildTicketCode(achat);
         Image qr = generateFakeQr(code, 260);
@@ -404,11 +426,13 @@ public class StoreController {
         dialog.showAndWait();
     }
 
+    // Construit un code unique de billet.
     private String buildTicketCode(Achat achat) {
         return "TKT-" + achat.getId() + "-" + achat.getUserId() + "-" + achat.getEventId();
     }
 
     // Génère un QR fictif (pattern unique) sans dépendance externe
+    // Construit un faux QR pour la démo.
     private Image generateFakeQr(String seed, int size) {
         int grid = 29;
         double cellSize = (double) size / grid;
@@ -445,6 +469,7 @@ public class StoreController {
         return image;
     }
 
+    // Dessine un pattern "finder" simplifié.
     private void drawFinder(PixelWriter pw, int gx, int gy, double cell) {
         for (int y = 0; y < 7; y++) {
             for (int x = 0; x < 7; x++) {
@@ -456,10 +481,12 @@ public class StoreController {
         }
     }
 
+    // Détecte si un point est dans un finder.
     private boolean isInsideFinder(int gx, int gy, int fx, int fy) {
         return gx >= fx && gx < fx + 7 && gy >= fy && gy < fy + 7;
     }
 
+    // Remplit une cellule du QR à une couleur donnée.
     private void fillCell(PixelWriter pw, int gx, int gy, double cell, Color color) {
         int startX = (int) Math.round(gx * cell);
         int startY = (int) Math.round(gy * cell);
@@ -472,6 +499,7 @@ public class StoreController {
         }
     }
 
+    // Affiche une alerte utilisateur.
     private void showAlert(String title, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -481,6 +509,7 @@ public class StoreController {
     }
 
     // Affiche un mini formulaire de carte bancaire et valide toujours le paiement après un court délai.
+    // Simule un paiement par carte pour recharger le solde.
     private void showCardPaymentDialog(double amount) {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Paiement par carte");
@@ -534,6 +563,7 @@ public class StoreController {
         dialog.showAndWait();
     }
 
+    // Applique la recharge au solde et met à jour l'UI.
     private void applyRecharge(double amount) {
         double newSolde = currentUser.getSolde() + amount;
         if (userDAO.updateSolde(currentUser.getId(), newSolde)) {

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+// Gère l'authentification, l'inscription et la récupération de mot de passe.
 public class AuthController {
 
     @FXML private StackPane contentStack;
@@ -77,6 +78,7 @@ public class AuthController {
     private User pendingUserForOtp;
     private User resetTargetUser;
 
+    // Initialise les vues et précharge les questions de sécurité.
     @FXML
     public void initialize() {
         // Prépare les données (questions, admin par défaut) et affiche l'écran d'accueil.
@@ -86,32 +88,38 @@ public class AuthController {
         showPane(landingPane);
     }
 
+    // Affiche l'écran d'accueil.
     @FXML
     private void handleShowLanding() {
         showPane(landingPane);
     }
 
+    // Affiche le formulaire de connexion.
     @FXML
     private void handleShowLogin() {
         showPane(loginPane);
     }
 
+    // Affiche le formulaire d'inscription.
     @FXML
     private void handleShowRegister() {
         showPane(registerPane);
     }
 
+    // Affiche l'écran de réinitialisation.
     @FXML
     private void handleShowReset() {
         showPane(resetPane);
         clearResetForm();
     }
 
+    // Affiche l'écran de saisie du code OTP.
     @FXML
     private void handleShowOtpPane() {
         showPane(otpPane);
     }
 
+    // Valide et enregistre un nouveau compte utilisateur.
     @FXML
     private void handleSubmitRegister() {
         String nom = safeValue(registerNameField);
@@ -163,6 +171,7 @@ public class AuthController {
         }
     }
 
+    // Valide la connexion et lance la 2FA.
     @FXML
     private void handleSubmitLogin() {
         String email = safeValue(loginEmailField).toLowerCase();
@@ -181,6 +190,7 @@ public class AuthController {
         }
     }
 
+    // Pré-remplit l'email admin pour les démos.
     @FXML
     private void handleAdminShortcut() {
         handleShowLogin();
@@ -189,11 +199,13 @@ public class AuthController {
         loginPasswordField.setPromptText("Mot de passe admin");
     }
 
+    // Bascule vers l'oubli de mot de passe.
     @FXML
     private void handleForgotPassword() {
         handleShowReset();
     }
 
+    // Ouvre l'interface admin après authentification.
     private void openMainScene() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/main.fxml"));
@@ -213,6 +225,7 @@ public class AuthController {
         }
     }
 
+    // Ouvre la boutique utilisateur (billets) après authentification.
     private void openStoreScene(User user) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/store/store.fxml"));
@@ -235,6 +248,7 @@ public class AuthController {
         }
     }
 
+    // Affiche uniquement le panneau cible dans le stack.
     private void showPane(VBox target) {
         VBox[] panes = {landingPane, loginPane, registerPane, resetPane, otpPane};
         for (VBox pane : panes) {
@@ -244,6 +258,7 @@ public class AuthController {
         }
     }
 
+    // Réinitialise les champs d'inscription.
     private void clearRegisterForm() {
         registerNameField.clear();
         registerEmailField.clear();
@@ -258,14 +273,17 @@ public class AuthController {
         answer3Field.clear();
     }
 
+    // Vérifie un format d'email simple.
     private boolean isValidEmail(String email) {
         return email != null && email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,}$");
     }
 
+    // Récupère un texte sécurisé (trim + null-safe).
     private String safeValue(TextField field) {
         return field != null && field.getText() != null ? field.getText().trim() : "";
     }
 
+    // Remplit les listes de questions de sécurité.
     private void populateSecurityCombos() {
         List<SecurityQuestion> questions = securityDAO.getQuestions();
         question1Combo.getItems().setAll(questions);
@@ -273,6 +291,7 @@ public class AuthController {
         question3Combo.getItems().setAll(questions);
     }
 
+    // Valide le choix des questions et des réponses.
     private boolean areQuestionsValid(SecurityQuestion q1, SecurityQuestion q2, SecurityQuestion q3,
                                       String a1, String a2, String a3) {
         if (q1 == null || q2 == null || q3 == null) {
@@ -290,6 +309,7 @@ public class AuthController {
         return true;
     }
 
+    // Enregistre les réponses de sécurité hashées.
     private void saveSecurityAnswers(User user, SecurityQuestion q1, SecurityQuestion q2, SecurityQuestion q3,
                                      String a1, String a2, String a3) {
         HashMap<Integer, String> map = new HashMap<>();
@@ -299,6 +319,7 @@ public class AuthController {
         securityDAO.saveSecurityAnswers(user.getId(), map);
     }
 
+    // Génère et envoie un code OTP pour la 2FA.
     private void startTwoFactor(User user) {
         this.pendingUserForOtp = user;
         String code = String.format("%06d", new Random().nextInt(999999));
@@ -317,6 +338,7 @@ public class AuthController {
         showPane(otpPane);
     }
 
+    // Vérifie le code OTP et ouvre l'interface correspondante.
     @FXML
     private void handleValidateOtp() {
         if (pendingUserForOtp == null) {
@@ -349,6 +371,7 @@ public class AuthController {
         }
     }
 
+    // Regénère un nouveau code OTP.
     @FXML
     private void handleResendOtp() {
         if (pendingUserForOtp == null) {
@@ -359,6 +382,7 @@ public class AuthController {
         startTwoFactor(pendingUserForOtp);
     }
 
+    // Charge les questions de sécurité pour la réinitialisation.
     @FXML
     private void handleLoadResetQuestions() {
         String email = safeValue(resetEmailField).toLowerCase();
@@ -395,6 +419,7 @@ public class AuthController {
         }
     }
 
+    // Valide la réinitialisation du mot de passe.
     @FXML
     private void handleSubmitReset() {
         if (resetTargetUser == null) {
@@ -437,6 +462,7 @@ public class AuthController {
         }
     }
 
+    // Remet à zéro le formulaire de réinitialisation.
     private void clearResetForm() {
         resetEmailField.clear();
         resetAnswer1Field.clear();
@@ -454,6 +480,7 @@ public class AuthController {
         resetTargetUser = null;
     }
 
+    // Affiche une alerte simple.
     private void showAlert(String title, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -462,6 +489,7 @@ public class AuthController {
         alert.showAndWait();
     }
 
+    // Garantit l'existence d'un compte admin de démonstration.
     private void ensureDefaultAdmin() {
         // Crée un compte admin par défaut si absent (utilisé pour la première connexion).
         if (!userDAO.emailExists(ADMIN_EMAIL)) {
@@ -473,6 +501,7 @@ public class AuthController {
         }
     }
 
+    // Crée une entrée client associée si elle n'existe pas.
     private void ensureClientEntry(String fullName, String email, String telephone) {
         if (clientDAO.findByEmail(email).isPresent()) {
             return;
@@ -487,6 +516,7 @@ public class AuthController {
         clientDAO.create(client);
     }
 
+    // Découpe un nom complet en prénom/nom.
     private String[] splitName(String fullName) {
         if (fullName == null || fullName.isBlank()) {
             return new String[]{"Utilisateur", "Inconnu"};

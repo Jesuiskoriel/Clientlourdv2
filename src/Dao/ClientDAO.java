@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// Accès aux données pour la table client.
 public class ClientDAO {
 
     private static final String BASE_SELECT = """
@@ -21,6 +22,7 @@ public class ClientDAO {
             FROM client
             """;
 
+    // Retourne tous les clients.
     public List<Client> findAll() {
         List<Client> clients = new ArrayList<>();
         try (
@@ -37,6 +39,7 @@ public class ClientDAO {
         return clients;
     }
 
+    // Recherche des clients par nom/prénom.
     public List<Client> searchByName(String term) {
         List<Client> clients = new ArrayList<>();
         String sql = BASE_SELECT + " WHERE nom LIKE ? OR prenom LIKE ? ORDER BY nom, prenom";
@@ -60,6 +63,7 @@ public class ClientDAO {
         return clients;
     }
 
+    // Recherche un client par id.
     public Optional<Client> findById(int id) {
         String sql = BASE_SELECT + " WHERE id_client = ?";
         try (
@@ -78,6 +82,7 @@ public class ClientDAO {
         return Optional.empty();
     }
 
+    // Recherche un client par email.
     public Optional<Client> findByEmail(String email) {
         String sql = BASE_SELECT + " WHERE email = ?";
         try (
@@ -96,6 +101,7 @@ public class ClientDAO {
         return Optional.empty();
     }
 
+    // Crée un client et remplit son id.
     public boolean create(Client client) {
         String sql = """
                 INSERT INTO client (nom, prenom, email, telephone, ville)
@@ -127,6 +133,7 @@ public class ClientDAO {
         return false;
     }
 
+    // Met à jour un client existant.
     public boolean update(Client client) {
         String sql = """
                 UPDATE client
@@ -150,6 +157,7 @@ public class ClientDAO {
         return false;
     }
 
+    // Supprime un client par id.
     public boolean delete(int id) {
         String sql = "DELETE FROM client WHERE id_client = ?";
         try (
@@ -164,6 +172,7 @@ public class ClientDAO {
         return false;
     }
 
+    // Transforme un ResultSet en objet Client.
     private Client mapClient(ResultSet rs) throws SQLException {
         Client client = new Client();
         client.setId(rs.getInt("id_client"));

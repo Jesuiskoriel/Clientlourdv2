@@ -44,10 +44,12 @@ public class MailService {
         this.socketTimeoutMs = parseInt(env.getOrDefault("SMTP_TIMEOUT_MS", "30000"), 30000);
     }
 
+    // Indique si l'envoi SMTP est configuré.
     public boolean isEnabled() {
         return enabled;
     }
 
+    // Envoie un email simple (retourne false si désactivé).
     public boolean sendEmail(String to, String subject, String body) {
         if (!enabled) {
             return false;
@@ -61,6 +63,7 @@ public class MailService {
         }
     }
 
+    // Implémente l'envoi SMTP bas niveau.
     private void send(String to, String subject, String body) throws IOException {
         // Ouverture de la connexion SMTP (SSL direct ou plain selon la config).
         SSLSocketFactory sslFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
@@ -111,12 +114,14 @@ public class MailService {
         rawSocket.close();
     }
 
+    // Envoie EHLO et valide la réponse.
     private void helo(PrintWriter writer, BufferedReader reader) throws IOException {
         logStep("sending EHLO");
         writeLine(writer, "EHLO localhost");
         expect(reader, 250, "ehlo");
     }
 
+    // Authentification SMTP LOGIN en base64.
     private void authLogin(PrintWriter writer, BufferedReader reader) throws IOException {
         logStep("auth login");
         writeLine(writer, "AUTH LOGIN");
@@ -129,6 +134,7 @@ public class MailService {
         expect(reader, 235, "auth pass");
     }
 
+    // Vérifie que la réponse SMTP correspond au code attendu.
     private void expect(BufferedReader reader, int expectedCode, String step) throws IOException {
         String line;
         while ((line = reader.readLine()) != null) {
@@ -151,15 +157,18 @@ public class MailService {
         System.out.println("[SMTP OK] " + step);
     }
 
+    // Log simple pour suivre les étapes SMTP.
     private void logStep(String step) {
         System.out.println("[SMTP] " + step);
     }
 
+    // Envoie une commande SMTP.
     private void writeLine(PrintWriter writer, String cmd) {
         writer.print(cmd + "\r\n");
         writer.flush();
     }
 
+    // Configure timeout et handshake SSL si besoin.
     private void configureSocket(Socket socket) throws IOException {
         socket.setSoTimeout(socketTimeoutMs);
         if (socket instanceof SSLSocket ssl) {
@@ -167,6 +176,7 @@ public class MailService {
         }
     }
 
+    // Parse un entier avec valeur par défaut.
     private int parseInt(String val, int fallback) {
         try {
             return Integer.parseInt(val);

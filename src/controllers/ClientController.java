@@ -28,6 +28,7 @@ import model.User;
 import java.util.List;
 import java.util.Optional;
 
+// Gère la liste, l'édition et le détail des clients.
 public class ClientController {
 
     @FXML private TableView<Client> clientTable;
@@ -52,6 +53,7 @@ public class ClientController {
     private final ObservableList<Client> clients = FXCollections.observableArrayList();
     private Client selectedClient;
 
+    // Configure la table, charge les données et gère les interactions.
     @FXML
     public void initialize() {
         configureTable();
@@ -77,6 +79,7 @@ public class ClientController {
         });
     }
 
+    // Configure les colonnes de la table des clients.
     private void configureTable() {
         // Lie chaque colonne aux propriétés du modèle Client et connecte la liste observable.
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -88,12 +91,14 @@ public class ClientController {
         clientTable.setItems(clients);
     }
 
+    // Recharge la liste complète.
     @FXML
     private void handleRefresh() {
         searchField.clear();
         loadClients();
     }
 
+    // Filtre les clients par nom/prénom.
     @FXML
     private void handleSearch() {
         String term = searchField.getText();
@@ -105,6 +110,7 @@ public class ClientController {
         clients.setAll(result);
     }
 
+    // Crée ou met à jour un client depuis le formulaire.
     @FXML
     private void handleSave() {
         if (!validateForm()) {
@@ -141,6 +147,7 @@ public class ClientController {
         }
     }
 
+    // Supprime le client sélectionné après confirmation.
     @FXML
     private void handleDelete() {
         Client toDelete = clientTable.getSelectionModel().getSelectedItem();
@@ -160,16 +167,19 @@ public class ClientController {
         }
     }
 
+    // Réinitialise le formulaire et la sélection.
     @FXML
     private void handleClearForm() {
         clientTable.getSelectionModel().clearSelection();
         clearForm();
     }
 
+    // Charge tous les clients depuis la base.
     private void loadClients() {
         clients.setAll(clientDAO.findAll());
     }
 
+    // Remplit le formulaire avec un client existant.
     private void populateForm(Client client) {
         nomField.setText(client.getNom());
         prenomField.setText(client.getPrenom());
@@ -178,6 +188,7 @@ public class ClientController {
         villeField.setText(client.getVille());
     }
 
+    // Vide les champs et annule la sélection.
     private void clearForm() {
         nomField.clear();
         prenomField.clear();
@@ -187,6 +198,7 @@ public class ClientController {
         selectedClient = null;
     }
 
+    // Vérifie que les champs obligatoires sont remplis.
     private boolean validateForm() {
         if (nomField.getText().isBlank() || prenomField.getText().isBlank()) {
             showAlert("Erreur", "Le nom et le prénom sont obligatoires.", Alert.AlertType.ERROR);
@@ -199,6 +211,7 @@ public class ClientController {
         return true;
     }
 
+    // Affiche une alerte pour l'utilisateur.
     private void showAlert(String title, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
@@ -207,6 +220,7 @@ public class ClientController {
         alert.showAndWait();
     }
 
+    // Affiche une fiche détaillée (billets + achats) du client.
     private void showClientDetails(Client client) {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Client : " + client.getNom() + " " + client.getPrenom());

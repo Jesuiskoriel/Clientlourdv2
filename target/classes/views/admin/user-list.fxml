@@ -14,6 +14,7 @@
             fx:controller="controllers.UserAdminController"
             style="-fx-background-color: transparent;">
 
+    <!-- En-tête et actions admin -->
     <top>
         <VBox spacing="10" style="-fx-padding: 16;">
             <Label text="Comptes utilisateurs 👤"
@@ -29,6 +30,7 @@
         </VBox>
     </top>
 
+    <!-- Tableau des utilisateurs -->
     <center>
         <TableView fx:id="userTable" prefHeight="420">
             <BorderPane.margin>

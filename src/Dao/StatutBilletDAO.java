@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// Accès aux données pour les statuts de billet.
 public class StatutBilletDAO {
 
     private static final String BASE_SELECT = """
@@ -19,6 +20,7 @@ public class StatutBilletDAO {
             FROM statut_billet
             """;
 
+    // Retourne tous les statuts disponibles.
     public List<StatutBillet> findAll() {
         List<StatutBillet> statuts = new ArrayList<>();
         try (
@@ -35,6 +37,7 @@ public class StatutBilletDAO {
         return statuts;
     }
 
+    // Recherche un statut par id.
     public Optional<StatutBillet> findById(int id) {
         String sql = BASE_SELECT + " WHERE id_statut = ?";
         try (
@@ -53,6 +56,7 @@ public class StatutBilletDAO {
         return Optional.empty();
     }
 
+    // Transforme un ResultSet en objet StatutBillet.
     private StatutBillet mapStatut(ResultSet rs) throws SQLException {
         return new StatutBillet(
                 rs.getInt("id_statut"),

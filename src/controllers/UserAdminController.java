@@ -15,6 +15,7 @@ import model.User;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+// Gère la liste des comptes utilisateurs pour l'admin.
 public class UserAdminController {
 
     @FXML private TableView<User> userTable;
@@ -30,12 +31,14 @@ public class UserAdminController {
     private final ObservableList<User> users = FXCollections.observableArrayList();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+    // Configure la table et charge les utilisateurs.
     @FXML
     public void initialize() {
         configureTable();
         loadUsers();
     }
 
+    // Définit les colonnes et formats d'affichage.
     private void configureTable() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("nomComplet"));
@@ -59,11 +62,13 @@ public class UserAdminController {
         userTable.setItems(users);
     }
 
+    // Recharge la liste des utilisateurs.
     @FXML
     private void handleRefresh() {
         loadUsers();
     }
 
+    // Supprime un utilisateur non admin après confirmation.
     @FXML
     private void handleDelete() {
         User selected = userTable.getSelectionModel().getSelectedItem();
@@ -89,11 +94,13 @@ public class UserAdminController {
         }
     }
 
+    // Charge les comptes depuis la base.
     private void loadUsers() {
         users.setAll(userDAO.findAll());
         userTable.refresh();
     }
 
+    // Affiche une alerte.
     private void showAlert(String title, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// Gère la liste des billets, filtres, transferts et remboursements.
 public class TicketController {
 
     @FXML private TableView<Billet> ticketTable;
@@ -45,6 +46,7 @@ public class TicketController {
     private final ObservableList<Billet> filteredBillets = FXCollections.observableArrayList();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    // Configure la table et charge les billets.
     @FXML
     public void initialize() {
         configureTable();
@@ -52,6 +54,7 @@ public class TicketController {
         loadTickets();
     }
 
+    // Lie les colonnes aux données des billets.
     private void configureTable() {
         codeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCodeUnique()));
         clientColumn.setCellValueFactory(data -> {
@@ -79,6 +82,7 @@ public class TicketController {
         ticketTable.setItems(filteredBillets);
     }
 
+    // Charge la liste des statuts possibles.
     private void configureStatutCombo() {
         List<StatutBillet> statuts = statutBilletDAO.findAll();
         statutCombo.setItems(FXCollections.observableArrayList(statuts));
@@ -98,11 +102,13 @@ public class TicketController {
         });
     }
 
+    // Recharge la liste complète.
     @FXML
     private void handleRefresh() {
         loadTickets();
     }
 
+    // Filtre la liste selon le champ de recherche.
     @FXML
     private void handleFilter() {
         String term = filterField.getText();
@@ -116,6 +122,7 @@ public class TicketController {
                 .collect(Collectors.toList()));
     }
 
+    // Met à jour le statut d'un billet.
     @FXML
     private void handleChangeStatut() {
         Billet billet = ticketTable.getSelectionModel().getSelectedItem();
@@ -131,6 +138,7 @@ public class TicketController {
         }
     }
 
+    // Transfère un billet vers un autre client.
     @FXML
     private void handleTransferTicket() {
         Billet billet = ticketTable.getSelectionModel().getSelectedItem();
@@ -160,6 +168,7 @@ public class TicketController {
         }
     }
 
+    // Supprime un billet et rembourse l'achat.
     @FXML
     private void handleRefundTicket() {
         Billet billet = ticketTable.getSelectionModel().getSelectedItem();
@@ -183,11 +192,13 @@ public class TicketController {
         }
     }
 
+    // Charge tous les billets depuis la base.
     private void loadTickets() {
         billets.setAll(billetDAO.findAll());
         filteredBillets.setAll(billets);
     }
 
+    // Vérifie si un billet correspond au filtre texte.
     private boolean matchesFilter(Billet billet, String term) {
         if (billet.getClient() != null) {
             if (billet.getClient().getNom() != null
@@ -206,6 +217,7 @@ public class TicketController {
         return billet.getCodeUnique() != null && billet.getCodeUnique().toLowerCase().contains(term);
     }
 
+    // Affiche une alerte.
     private void showAlert(String title, String content, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

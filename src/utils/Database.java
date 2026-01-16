@@ -17,6 +17,7 @@ public final class Database {
     private Database() {
     }
 
+    // Ouvre une connexion JDBC selon les variables d'environnement.
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }

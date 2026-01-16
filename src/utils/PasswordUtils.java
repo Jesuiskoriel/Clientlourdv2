@@ -12,6 +12,7 @@ public final class PasswordUtils {
     private PasswordUtils() {
     }
 
+    // Hash un mot de passe en SHA-256.
     public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -22,6 +23,7 @@ public final class PasswordUtils {
         }
     }
 
+    // Compare un mot de passe clair avec un hash stocké.
     public static boolean matches(String rawPassword, String storedHash) {
         if (rawPassword == null || storedHash == null) {
             return false;
@@ -29,6 +31,7 @@ public final class PasswordUtils {
         return hashPassword(rawPassword).equals(storedHash);
     }
 
+    // Convertit un tableau de bytes en chaîne hexadécimale.
     private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder();
         for (byte b : hash) {

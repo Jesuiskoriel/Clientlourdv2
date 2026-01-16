@@ -20,6 +20,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+// Gère la création, la mise à jour et la liste des événements.
 public class EventController {
 
     @FXML private TableView<Evenement> eventTable;
@@ -43,6 +44,7 @@ public class EventController {
     private Evenement selectedEvent;
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
+    // Configure l'UI et charge les événements.
     @FXML
     public void initialize() {
         configureTable();
@@ -58,6 +60,7 @@ public class EventController {
         });
     }
 
+    // Associe les colonnes aux propriétés du modèle.
     private void configureTable() {
         nomColumn.setCellValueFactory(new PropertyValueFactory<>("nom"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("dateEvent"));
@@ -68,16 +71,19 @@ public class EventController {
         eventTable.setItems(events);
     }
 
+    // Configure la plage de capacité.
     private void configureSpinner() {
         capaciteSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100000, 100, 50));
     }
 
+    // Recharge la table et nettoie la sélection.
     @FXML
     private void handleRefresh() {
         loadEvents();
         eventTable.getSelectionModel().clearSelection();
     }
 
+    // Crée ou met à jour l'événement depuis le formulaire.
     @FXML
     private void handleSave() {
         if (!validateForm()) {
@@ -104,6 +110,7 @@ public class EventController {
         }
     }
 
+    // Supprime l'événement sélectionné.
     @FXML
     private void handleDelete() {
         Evenement toDelete = eventTable.getSelectionModel().getSelectedItem();
@@ -118,12 +125,14 @@ public class EventController {
         }
     }
 
+    // Vide le formulaire d'édition.
     @FXML
     private void handleClearForm() {
         eventTable.getSelectionModel().clearSelection();
         clearForm();
     }
 
+    // Remplit les champs depuis l'événement choisi.
     private void populateForm(Evenement evenement) {
         nomField.setText(evenement.getNom());
         dateField.setValue(evenement.getDateEvent());
@@ -134,6 +143,7 @@ public class EventController {
         descriptionArea.setText(evenement.getDescription());
     }
 
+    // Réinitialise les champs et la sélection.
     private void clearForm() {
         nomField.clear();
         dateField.setValue(null);
@@ -145,10 +155,12 @@ public class EventController {
         selectedEvent = null;
     }
 
+    // Charge les événements depuis la base.
     private void loadEvents() {
         events.setAll(evenementDAO.findAll());
     }
 
+    // Vérifie la validité des entrées du formulaire.
     private boolean validateForm() {
         if (nomField.getText().isBlank() || lieuField.getText().isBlank()) {
             showAlert("Erreur", "Nom et lieu sont obligatoires.", Alert.AlertType.ERROR);
@@ -177,6 +189,7 @@ public class EventController {
         return true;
     }
 
+    // Affiche une alerte simple.
     private void showAlert(String title, String msg, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

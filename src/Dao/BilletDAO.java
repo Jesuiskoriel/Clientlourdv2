@@ -18,6 +18,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+// Accès aux données pour les billets et leurs relations.
 public class BilletDAO {
 
     private static final String BASE_SELECT = """
@@ -48,6 +49,7 @@ public class BilletDAO {
             JOIN statut_billet s ON s.id_statut = b.fk_statut
             """;
 
+    // Retourne tous les billets (avec client/événement/statut).
     public List<Billet> findAll() {
         List<Billet> billets = new ArrayList<>();
         try (
@@ -64,6 +66,7 @@ public class BilletDAO {
         return billets;
     }
 
+    // Retourne les billets d'un client donné.
     public List<Billet> findByClient(int clientId) {
         List<Billet> billets = new ArrayList<>();
         String sql = BASE_SELECT + " WHERE b.fk_client = ? ORDER BY b.date_achat DESC";
@@ -83,6 +86,7 @@ public class BilletDAO {
         return billets;
     }
 
+    // Crée un billet et renseigne l'id/date d'achat.
     public boolean create(Billet billet) {
         String sql = """
                 INSERT INTO billet (code_unique, fk_client, fk_evenement, fk_statut, prix_paye)
@@ -113,6 +117,7 @@ public class BilletDAO {
         return false;
     }
 
+    // Met à jour le statut d'un billet.
     public boolean updateStatut(int billetId, int statutId) {
         String sql = "UPDATE billet SET fk_statut = ? WHERE id_billet = ?";
         try (
@@ -128,6 +133,7 @@ public class BilletDAO {
         return false;
     }
 
+    // Transfère un billet vers un autre client.
     public boolean updateClient(int billetId, int clientId) {
         String sql = "UPDATE billet SET fk_client = ? WHERE id_billet = ?";
         try (
@@ -143,6 +149,7 @@ public class BilletDAO {
         return false;
     }
 
+    // Supprime un billet.
     public boolean delete(int billetId) {
         String sql = "DELETE FROM billet WHERE id_billet = ?";
         try (
@@ -157,6 +164,7 @@ public class BilletDAO {
         return false;
     }
 
+    // Transforme un ResultSet en objet Billet complet.
     private Billet mapBillet(ResultSet rs) throws SQLException {
         Client client = new Client();
         client.setId(rs.getInt("fk_client"));

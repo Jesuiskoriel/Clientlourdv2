@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// Accès aux données pour les paiements des billets.
 public class PaiementDAO {
 
     private static final String BASE_SELECT = """
@@ -21,6 +22,7 @@ public class PaiementDAO {
             FROM paiement
             """;
 
+    // Retourne la liste complète des paiements.
     public List<Paiement> findAll() {
         List<Paiement> paiements = new ArrayList<>();
         try (
@@ -37,6 +39,7 @@ public class PaiementDAO {
         return paiements;
     }
 
+    // Retourne les paiements liés à un billet.
     public List<Paiement> findByBillet(int billetId) {
         List<Paiement> paiements = new ArrayList<>();
         String sql = BASE_SELECT + " WHERE fk_billet = ? ORDER BY date_paiement DESC";
@@ -56,6 +59,7 @@ public class PaiementDAO {
         return paiements;
     }
 
+    // Recherche un paiement par id.
     public Optional<Paiement> findById(int id) {
         String sql = BASE_SELECT + " WHERE id_paiement = ?";
         try (
@@ -74,6 +78,7 @@ public class PaiementDAO {
         return Optional.empty();
     }
 
+    // Enregistre un paiement et renseigne l'id/date.
     public boolean create(Paiement paiement) {
         String sql = """
                 INSERT INTO paiement (fk_billet, montant, mode_paiement, reference)
@@ -103,6 +108,7 @@ public class PaiementDAO {
         return false;
     }
 
+    // Transforme un ResultSet en objet Paiement.
     private Paiement mapPaiement(ResultSet rs) throws SQLException {
         Paiement paiement = new Paiement();
         paiement.setId(rs.getInt("id_paiement"));

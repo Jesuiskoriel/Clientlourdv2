@@ -32,6 +32,7 @@ public class SecurityDAO {
             new SecurityQuestion(10, "Quel est le prénom de votre ami d’enfance ?")
     );
 
+    // Initialise les tables de sécurité et les questions par défaut.
     public void ensureSetup() {
         try (Connection conn = Database.getConnection()) {
             // Crée les tables liées à la sécurité si elles n'existent pas.
@@ -68,6 +69,7 @@ public class SecurityDAO {
         }
     }
 
+    // Insère les questions par défaut si absentes.
     private void seedQuestions(Connection conn) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(
                 "INSERT IGNORE INTO security_question (id, libelle) VALUES (?, ?)")) {
@@ -80,6 +82,7 @@ public class SecurityDAO {
         }
     }
 
+    // Retourne toutes les questions disponibles.
     public List<SecurityQuestion> getQuestions() {
         List<SecurityQuestion> questions = new ArrayList<>();
         try (Connection conn = Database.getConnection();
@@ -94,6 +97,7 @@ public class SecurityDAO {
         return questions;
     }
 
+    // Sauvegarde les réponses de sécurité (hashées).
     public void saveSecurityAnswers(int userId, Map<Integer, String> answersByQuestion) {
         String sql = """
                 INSERT INTO security_answer (user_id, question_id, answer_hash)
@@ -114,6 +118,7 @@ public class SecurityDAO {
         }
     }
 
+    // Récupère les questions associées à un utilisateur.
     public List<SecurityQuestion> findUserQuestions(int userId) {
         List<SecurityQuestion> result = new ArrayList<>();
         String sql = """
@@ -136,6 +141,7 @@ public class SecurityDAO {
         return result;
     }
 
+    // Vérifie si les réponses fournies correspondent (au moins 3).
     public boolean validateAnswers(int userId, Map<Integer, String> providedHashes) {
         String sql = "SELECT question_id, answer_hash FROM security_answer WHERE user_id = ?";
         try (Connection conn = Database.getConnection();
@@ -159,6 +165,7 @@ public class SecurityDAO {
         return false;
     }
 
+    // Enregistre un code OTP avec date d'expiration.
     public void storeOtp(int userId, String code, LocalDateTime expiresAt) {
         String sql = """
                 INSERT INTO otp_token (user_id, code, expires_at)
@@ -176,6 +183,7 @@ public class SecurityDAO {
         }
     }
 
+    // Récupère le code OTP courant pour un utilisateur.
     public Optional<OtpToken> getOtp(int userId) {
         String sql = "SELECT code, expires_at FROM otp_token WHERE user_id = ?";
         try (Connection conn = Database.getConnection();
@@ -198,6 +206,7 @@ public class SecurityDAO {
         return Optional.empty();
     }
 
+    // Supprime le code OTP stocké.
     public void clearOtp(int userId) {
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement("DELETE FROM otp_token WHERE user_id = ?")) {
@@ -208,6 +217,7 @@ public class SecurityDAO {
         }
     }
 
+    // Expose les questions par défaut.
     public List<SecurityQuestion> defaultQuestions() {
         return DEFAULT_QUESTIONS;
     }

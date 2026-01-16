@@ -11,8 +11,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+// Accès aux données pour les achats en ligne.
 public class AchatDAO {
 
+    // Enregistre un achat d'événement pour un utilisateur.
     public boolean create(int userId, int eventId, double prix) {
         String sql = """
                 INSERT INTO achat_utilisateur (id_utilisateur, id_evenement, prix_achat)
@@ -32,6 +34,7 @@ public class AchatDAO {
         return false;
     }
 
+    // Liste les achats d'un utilisateur.
     public List<Achat> findByUser(int userId) {
         List<Achat> achats = new ArrayList<>();
         String sql = """
@@ -70,6 +73,7 @@ public class AchatDAO {
         return achats;
     }
 
+    // Supprime un achat (remboursement).
     public boolean delete(int achatId) {
         String sql = "DELETE FROM achat_utilisateur WHERE id_achat = ?";
         try (
@@ -84,6 +88,7 @@ public class AchatDAO {
         return false;
     }
 
+    // Compte le nombre d'achats pour un événement.
     public int countByEvent(int eventId) {
         String sql = "SELECT COUNT(*) FROM achat_utilisateur WHERE id_evenement = ?";
         try (

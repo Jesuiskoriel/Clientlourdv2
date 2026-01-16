@@ -15,6 +15,7 @@
             fx:controller="controllers.MainSceneController"
             style="-fx-background-color: transparent;">
 
+    <!-- Barre supérieure: menu + bannière -->
     <top>
         <VBox>
             <MenuBar>
@@ -36,6 +37,7 @@
         </VBox>
     </top>
 
+    <!-- Navigation latérale -->
     <left>
         <VBox spacing="12" styleClass="nav-rail">
             <Label text="Navigation" styleClass="nav-title"/>
@@ -46,6 +48,7 @@
         </VBox>
     </left>
 
+    <!-- Zone centrale: contenu chargé dynamiquement -->
     <center>
         <StackPane style="-fx-padding: 20;">
             <Label text="Chargement..."
@@ -53,6 +56,7 @@
         </StackPane>
     </center>
 
+    <!-- Barre de statut -->
     <bottom>
         <Label fx:id="statusLabel"
                text="Prêt"

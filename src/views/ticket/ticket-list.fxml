@@ -16,6 +16,7 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controllers.TicketController">
 
+    <!-- En-tête + filtres -->
     <top>
         <VBox spacing="10" style="-fx-padding: 15;">
             <Label text="Billets et paiements"
@@ -29,6 +30,7 @@
         </VBox>
     </top>
 
+    <!-- Tableau des billets -->
     <center>
         <TableView fx:id="ticketTable">
             <BorderPane.margin>
@@ -45,6 +47,7 @@
         </TableView>
     </center>
 
+    <!-- Actions sur billets (statut, transfert, remboursement) -->
     <bottom>
         <VBox spacing="12" style="-fx-padding: 15; -fx-background-color: #f7f9fb;">
             <HBox spacing="15" alignment="CENTER_LEFT">

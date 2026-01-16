@@ -22,6 +22,7 @@
             fx:controller="controllers.EventController"
             style="-fx-background-color: linear-gradient(to bottom, #f8fbff 0%, #eef3ff 45%, #fefefe 100%);">
 
+    <!-- En-tête marketing + actions rapides -->
     <top>
         <VBox spacing="12" style="-fx-padding: 18;">
             <HBox spacing="18" style="-fx-background-color: linear-gradient(to right, #4361ee, #5e60ce); -fx-padding: 16; -fx-background-radius: 12;">
@@ -51,6 +52,7 @@
         </VBox>
     </top>
 
+    <!-- Tableau des événements -->
     <center>
         <TableView fx:id="eventTable" style="-fx-background-radius: 10; -fx-border-color: #dbe4ff; -fx-border-radius: 10; -fx-border-width: 1;">
             <BorderPane.margin>
@@ -67,6 +69,7 @@
         </TableView>
     </center>
 
+    <!-- Formulaire de création/modification -->
     <bottom>
         <VBox spacing="12" style="-fx-padding: 16; -fx-background-color: #fff; -fx-background-radius: 14; -fx-border-color: #dbe4ff; -fx-border-radius: 14; -fx-border-width: 1; -fx-effect: dropshadow(gaussian, rgba(67,97,238,0.08), 12, 0.2, 0, 4);">
             <Label text="🎧 Composer un nouvel événement"

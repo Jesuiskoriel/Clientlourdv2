@@ -6,8 +6,10 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 
+// Point d'entrée JavaFX de l'application.
 public class App extends Application {
 
+    // Démarre l'application et charge la première scène.
     @Override
     public void start(Stage primaryStage) {
 
@@ -40,6 +42,7 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        // Lance le runtime JavaFX.
         launch(args);
     }
 }

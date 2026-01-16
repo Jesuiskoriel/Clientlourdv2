@@ -19,6 +19,7 @@
             fx:controller="controllers.ClientController"
             style="-fx-background-color: transparent;">
 
+    <!-- En-tête: titre + recherche -->
     <top>
         <VBox spacing="10" style="-fx-padding: 16;">
             <Label text="Gestion des clients 👥"
@@ -32,6 +33,7 @@
         </VBox>
     </top>
 
+    <!-- Tableau des clients -->
     <center>
         <TableView fx:id="clientTable" prefHeight="300">
             <BorderPane.margin>
@@ -48,6 +50,7 @@
         </TableView>
     </center>
 
+    <!-- Formulaire de création/modification -->
     <bottom>
         <VBox style="-fx-padding: 15; -fx-background-color: #f7f9fb;" spacing="12">
             <Label text="Formulaire client"

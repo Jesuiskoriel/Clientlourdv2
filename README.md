@@ -1,36 +1,53 @@
 # 🎟️ Projet Client Lourd – Application de Billetterie
 
-## 📌 Aperçu
-Application JavaFX de billetterie (client lourd) : authentification avec 2FA par email, boutique de billets, gestion admin (clients, événements, billets, comptes), et base MySQL pilotée via DAO.  
-Le projet est conçu pour illustrer un CRUD complet + un vrai flux utilisateur (inscription → connexion → 2FA → achat).
+## 📌 Aperçu (en mots simples)
+Ce projet est une application de billetterie "sur ordinateur" (pas un site web).
+Elle permet :
+- de créer un compte et se connecter,
+- de recevoir un code par email pour confirmer la connexion,
+- d'acheter des billets,
+- et d'administrer clients, evenements, billets et comptes.
+
+L'objectif est d'avoir un exemple complet de gestion de donnees : creation, lecture, modification, suppression.
 
 ---
 
 ## 📂 Arborescence du projet
+(resume)
+- `src/` : le code de l'application
+- `src/views/` : les ecrans (interface JavaFX)
+- `src/controllers/` : la logique liee aux ecrans
+- `src/dao/` : la couche qui parle a la base de donnees
+- `src/model/` : les objets metier (Client, Billet, etc.)
+- `data.sql` / `basededonnees/` : scripts pour la base MySQL
+- `pom.xml` : configuration Maven (construction du projet)
+- `docker-compose.yml` : demarrer la base via Docker
+
+## 🛠️ Technologies utilisees (explication simple)
+- **Java** : langage principal de l'application.
+- **JavaFX** : outil pour creer les ecrans (fenetres, boutons, tableaux).
+- **MySQL** : la base de donnees (ou sont ranges clients, evenements, billets).
+- **DAO** : "Data Access Object", une classe qui sert d'intermediaire entre Java et la base.
+- **Maven** : outil qui telecharge les dependances et compile le projet.
+- **Docker** : outil pour lancer une base MySQL prete a l'emploi, sans installation manuelle.
+- **PlantUML** : pour dessiner des schemas UML.
+- **Python + Faker** : pour creer des donnees de test.
+- **Git / GitHub** : pour versionner le code.
+
 ---
 
-## 🛠️ Technologies utilisées
-- **PlantUML** – pour la modélisation UML  
-- **MySQL** – base de données relationnelle  
-- **Python + Faker** – génération automatique de données  
-- **Java (models + DAO)** – accès aux données  
-- **JavaFX** – interface utilisateur  
-- **Git / GitHub** – versionnement et suivi du projet
-
----
-
-## 📊 Génération des données
-Le script `generate_data.py` génère automatiquement :
+## 📊 Generation des donnees
+Le script `generate_data.py` cree automatiquement :
 
 - 50 clients  
 - 10 événements  
 - 100 billets  
 
-Les données produites sont sauvegardées dans `data.sql` et peuvent être importées dans MySQL Workbench.
+Les donnees produites sont sauvegardees dans `data.sql` et peuvent etre importees dans MySQL Workbench.
 
 ---
 
-## 🔗 Accès aux données via Java
+## 🔗 Acces aux donnees via Java (DAO)
 
 ### Modèles :
 - `Client.java`
@@ -41,7 +58,7 @@ Les données produites sont sauvegardées dans `data.sql` et peuvent être impor
 - `StatutBillet.java`
 - `Paiement.java`
 
-### DAO :
+### DAO (classes qui parlent a la base) :
 - `ClientDAO.java`
 - `UserDAO.java`
 - `AchatDAO.java`
@@ -50,23 +67,23 @@ Les données produites sont sauvegardées dans `data.sql` et peuvent être impor
 - `StatutBilletDAO.java`
 - `PaiementDAO.java`
 
-### Fonctionnalités des DAO :
-- Récupération de tous les enregistrements
-- Recherche par ID
-- Ajout, modification et suppression (CRUD)
-- Gestion de l’intégrité via les clés étrangères et la table `statut_billet`
+### Ce que font les DAO (en clair) :
+- lire les donnees (ex: liste des clients)
+- trouver un element par id
+- ajouter, modifier, supprimer (CRUD)
+- respecter les liens entre tables (ex: un billet est lie a un client)
 
-La connexion MySQL est centralisée dans `Database.java`.
+La connexion MySQL est centralisee dans `Database.java`.
 
 ---
 
-## 🔐 Fonctionnement global
+## 🔐 Fonctionnement global (explication simple)
 
-### 1) Authentification + 2FA
-- Écran d’accueil : Connexion / Création de compte.
-- Mot de passe haché côté application (SHA-256 via `PasswordUtils`).
-- Après connexion, un code OTP est généré et envoyé par email (SMTP).
-- Validation OTP → accès à l’interface principale.
+### 1) Connexion + code de verification (2FA)
+- Ecran d'accueil : Connexion / Creation de compte.
+- Le mot de passe est transforme en "hash" (une version protegee).
+- Apres connexion, un code est envoye par email.
+- Si le code est bon, l'utilisateur accede a l'application.
 
 ### 2) Interface Admin
 Menu “Gestion” :
@@ -78,14 +95,22 @@ Menu “Gestion” :
 ### 3) Boutique Utilisateur
 - Solde fictif stocké en base (`utilisateur.solde`).
 - Cartes d’événements, achat de billets, historique d’achats.
-- QR code fictif généré pour chaque achat.
-- Recharge du solde via un **paiement fictif** (formulaire carte → “paiement accepté”).
+- QR code fictif genere pour chaque achat.
+- Recharge du solde via un **paiement fictif** (formulaire carte → "paiement accepte").
 
 ---
 
-## ▶️ Lancer l’application
+## ▶️ Lancer l'application
 
-### Via VS Code (recommandé)
+### Option A: Maven (le plus simple)
+Si Maven est installe, vous pouvez compiler plus facilement.
+Exemple :
+```bash
+mvn clean compile
+```
+Ensuite lancez l'application via votre IDE ou une commande Java (voir plus bas).
+
+### Via VS Code (recommande)
 Utilisez le bouton **Run JavaFX App** (configuration dans `.vscode/launch.json`).
 
 ### macOS (terminal)
@@ -122,17 +147,23 @@ Get-ChildItem -Recurse -Filter *.java src | ForEach-Object { $_.FullName } | Set
 
 ---
 
-## 🧩 Installation complète (pas à pas)
+## 🧩 Installation complete (pas a pas, tres simple)
 
 1) **Installer Java**
-- JDK 17+ recommandé (ex. OpenJDK via Homebrew).
-- Vérifiez : `java -version`
+- Version 17 ou plus.
+- Verifiez : `java -version`
 
-2) **Préparer la base MySQL**
-- Créez la base `billeterie`.
-- Importez `data.sql` (tables + données de démo).
+2) **Preparer la base MySQL**
+- Creez la base `billeterie`.
+- Importez `data.sql` (tables + donnees de demo).
 
-3) **Vérifier les dépendances**
+Alternative simple avec Docker (si installe) :
+```bash
+docker compose up -d
+```
+Cela demarre une base MySQL automatiquement.
+
+3) **Verifier les dependances**
 - Le dossier `lib/` doit contenir :
   - JavaFX (`javafx.controls`, `javafx.fxml`, `javafx.graphics`, `javafx.swing`)
   - `mysql-connector-j-9.4.0.jar`
@@ -140,7 +171,7 @@ Get-ChildItem -Recurse -Filter *.java src | ForEach-Object { $_.FullName } | Set
 4) **Compiler et lancer**
 - Utilisez VS Code (Run) ou les commandes terminal indiquées plus haut.
 
-5) **Configurer l’OTP par email (optionnel)**
+5) **Configurer l'OTP par email (optionnel)**
 - Voir la section SMTP ci-dessous.
 
 ---
@@ -157,31 +188,31 @@ SMTP_PASS=mot_de_passe_app
 SMTP_FROM=votre_email@gmail.com
 SMTP_TIMEOUT_MS=60000
 ```
-Sans ces variables, l’envoi d’email est désactivé.
+Sans ces variables, l'envoi d'email est desactive.
 
 ---
 
-## 🧰 Dépannage rapide
+## 🧰 Depannage rapide
 
-### L’app ne démarre pas / JavaFX introuvable
-- Vérifiez `JAVA_HOME` (macOS) : `export JAVA_HOME=/opt/homebrew/opt/openjdk`
+### L'app ne demarre pas / JavaFX introuvable
+- Verifiez `JAVA_HOME` (macOS) : `export JAVA_HOME=/opt/homebrew/opt/openjdk`
 - Assurez-vous que `lib/` contient les JAR JavaFX et MySQL.
 - Recompilez : `javac ...` puis relancez `java ...`.
 
 ### Les emails OTP ne partent pas
-- Utilisez un **mot de passe d’application** Gmail.
-- Vérifiez les variables `SMTP_*`.
-- Pour tester la connexion :  
-  `openssl s_client -connect smtp.gmail.com:465 -crlf -quiet`  
+- Utilisez un **mot de passe d'application** Gmail.
+- Verifiez les variables `SMTP_*`.
+- Pour tester la connexion :
+  `openssl s_client -connect smtp.gmail.com:465 -crlf -quiet`
   ou `openssl s_client -connect smtp.gmail.com:587 -starttls smtp -crlf -quiet`
 
-### Les événements n’apparaissent pas
-- Si votre table a les colonnes `date_evenement` / `prix`, le DAO gère déjà l’héritage (`COALESCE`).  
-- Assurez-vous que des données existent dans la table `evenement`.
+### Les evenements n'apparaissent pas
+- Si votre table a les colonnes `date_evenement` / `prix`, le DAO s'adapte.
+- Assurez-vous que des donnees existent dans la table `evenement`.
 
 ---
 
-## 🗂️ Structure des tables (résumé)
+## 🗂️ Structure des tables (resume)
 
 ### utilisateur
 - `id_utilisateur` (PK), `nom_complet`, `email` (unique), `telephone`, `mot_de_passe` (hash), `solde`, `is_admin`, `date_creation`
@@ -196,6 +227,14 @@ Sans ces variables, l’envoi d’email est désactivé.
 - Tables de gestion (clients, billets, statut, questions secrètes, OTP).
 
 ---
+
+## ❓ Lexique (pour debutants)
+- **Maven** : outil qui telecharge les librairies et compile le projet.
+- **Docker** : outil pour lancer des services (ex: MySQL) sans installation manuelle.
+- **DAO** : classe qui fait le lien entre le code Java et la base de donnees.
+- **CRUD** : Create, Read, Update, Delete (creer, lire, modifier, supprimer).
+- **OTP** : code temporaire recu par email pour verifier la connexion.
+- **Hash** : transformation d'un mot de passe en valeur securisee.
 
 ## ❓ FAQ
 

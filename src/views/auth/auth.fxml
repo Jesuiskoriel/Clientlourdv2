@@ -140,12 +140,10 @@
         </StackPane>
     </center>
 
-    <!-- Accès admin rapide -->
+    <!-- Accès admin rapide (retiré) -->
     <bottom>
         <HBox alignment="CENTER_RIGHT" style="-fx-padding: 10 20 20 20;">
             <HBox HBox.hgrow="ALWAYS"/>
-            <Button text="Espace admin" onAction="#handleAdminShortcut"
-                    style="-fx-background-color: transparent; -fx-border-color: #1971c2; -fx-text-fill: #1971c2;"/>
         </HBox>
     </bottom>
 

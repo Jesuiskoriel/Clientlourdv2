@@ -42,7 +42,7 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        // Lance le runtime JavaFX.
+        // Lance  Le runtime JavaFX.
         launch(args);
     }
 }

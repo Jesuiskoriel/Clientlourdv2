@@ -2,8 +2,8 @@ FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml ./
 COPY src ./src
-RUN mvn -DskipTests -Djavafx.platform=linux-aarch64 package \
-    && mvn -DskipTests -Djavafx.platform=linux-aarch64 \
+RUN mvn -DskipTests -Djavafx.platform=linux package \
+    && mvn -DskipTests -Djavafx.platform=linux \
         -DincludeGroupIds=org.openjfx \
         -DoutputDirectory=/app/javafx \
         dependency:copy-dependencies

@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
-import java.util.Map;
 
 /**
  * Envoie un email simple via SMTP (AUTH LOGIN).
@@ -32,16 +31,15 @@ public class MailService {
     private final int socketTimeoutMs;
 
     public MailService() {
-        Map<String, String> env = System.getenv();
-        this.host = env.getOrDefault("SMTP_HOST", "");
-        this.port = parseInt(env.getOrDefault("SMTP_PORT", "587"), 587);
-        this.user = env.getOrDefault("SMTP_USER", "");
-        this.pass = env.getOrDefault("SMTP_PASS", "");
-        this.from = env.getOrDefault("SMTP_FROM", this.user);
-        this.useStartTls = Boolean.parseBoolean(env.getOrDefault("SMTP_STARTTLS", "true"));
-        this.useSsl = Boolean.parseBoolean(env.getOrDefault("SMTP_SSL", "false"));
+        this.host = Config.get("SMTP_HOST", "");
+        this.port = parseInt(Config.get("SMTP_PORT", "587"), 587);
+        this.user = Config.get("SMTP_USER", "");
+        this.pass = Config.get("SMTP_PASS", "");
+        this.from = Config.get("SMTP_FROM", this.user);
+        this.useStartTls = Boolean.parseBoolean(Config.get("SMTP_STARTTLS", "true"));
+        this.useSsl = Boolean.parseBoolean(Config.get("SMTP_SSL", "false"));
         this.enabled = !host.isBlank() && !user.isBlank() && !pass.isBlank();
-        this.socketTimeoutMs = parseInt(env.getOrDefault("SMTP_TIMEOUT_MS", "30000"), 30000);
+        this.socketTimeoutMs = parseInt(Config.get("SMTP_TIMEOUT_MS", "30000"), 30000);
     }
 
     // Indique si l'envoi SMTP est configuré.
@@ -89,8 +87,8 @@ public class MailService {
             helo(writer, reader);
         }
 
-        // Authentification LOGIN (base64) puis envoi de l'email.
-        authLogin(writer, reader);
+        // Authentification SMTP puis envoi de l'email.
+        authenticate(writer, reader);
 
         writeLine(writer, "MAIL FROM:<" + from + ">");
         expect(reader, 250, "mail from");
@@ -119,6 +117,19 @@ public class MailService {
         logStep("sending EHLO");
         writeLine(writer, "EHLO localhost");
         expect(reader, 250, "ehlo");
+    }
+
+    // Essaie AUTH PLAIN puis retombe sur AUTH LOGIN si nécessaire.
+    private void authenticate(PrintWriter writer, BufferedReader reader) throws IOException {
+        authPlain(writer, reader);
+    }
+
+    // Authentification SMTP PLAIN en base64.
+    private void authPlain(PrintWriter writer, BufferedReader reader) throws IOException {
+        logStep("auth plain");
+        String payload = "\0" + user + "\0" + pass;
+        writeLine(writer, "AUTH PLAIN " + Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8)));
+        expect(reader, 235, "auth plain");
     }
 
     // Authentification SMTP LOGIN en base64.

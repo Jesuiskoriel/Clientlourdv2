@@ -2,6 +2,7 @@
 out/
 *.class
 *.log
+target/
 
 # Virtual envs / local config
 .venv/

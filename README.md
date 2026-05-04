@@ -18,6 +18,8 @@ Application desktop de gestion de billetterie (client lourd) avec :
 - `basededonnees/` : scripts SQL (schéma + données)
 - `docker/init-auth.sql` : tables d'authentification + compte admin de démo
 - `run-local.sh` : lancement local rapide
+- `build-mac.sh` : build du JAR macOS (`target/billeterie-mac.jar`)
+- `build-windows.sh` : build du JAR Windows (`target/billeterie-windows.jar`)
 - `pom.xml` : build Maven
 
 ## Prérequis
@@ -68,10 +70,10 @@ mysql -u root -p < docker/init-auth.sql
 ./run-local.sh
 ```
 
-Lancer directement le JAR (sans autre commande) :
+Lancer directement le JAR macOS :
 
 ```bash
-java -jar target/clientlourdv2-1.0.0-all.jar
+java -jar target/billeterie-mac.jar
 ```
 
 Sous Windows, vous pouvez aussi lancer `run-windows.bat` (double-clic).
@@ -88,28 +90,21 @@ Ce compte est défini dans :
 
 ## Générer le JAR de livraison
 
+macOS :
 ```bash
-mvn -DskipTests clean package
-cp target/clientlourdv2-1.0.0-all.jar target/billeterie.jar
+./build-mac.sh
 ```
 
-Build Windows dédié :
-
+Windows :
 ```bash
-mvn -DskipTests -Djavafx.platform=win clean package
-cp target/clientlourdv2-1.0.0-all.jar target/billeterie-windows.jar
-```
-
-Lancer le jar :
-
-```bash
-java -jar target/billeterie.jar
+./build-windows.sh
 ```
 
 ## Dépannage rapide
 
 ### `Error: JavaFX runtime components are missing`
-- sous Windows, lancez le JAR fat : `target/billeterie-windows.jar` (ou `target/clientlourdv2-1.0.0-all.jar`)
+- sous Windows, lancez `billeterie-windows.jar`
+- sous macOS, lancez `billeterie-mac.jar`
 - n'utilisez pas `clientlourdv2-1.0.0.jar` (JAR mince, sans dépendances)
 - vérifiez la version Java : `java -version` (Java 17+)
 

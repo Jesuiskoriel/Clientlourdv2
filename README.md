@@ -108,6 +108,11 @@ java -jar target/billeterie.jar
 
 ## Dépannage rapide
 
+### `Error: JavaFX runtime components are missing`
+- sous Windows, lancez le JAR fat : `target/billeterie-windows.jar` (ou `target/clientlourdv2-1.0.0-all.jar`)
+- n'utilisez pas `clientlourdv2-1.0.0.jar` (JAR mince, sans dépendances)
+- vérifiez la version Java : `java -version` (Java 17+)
+
 ### L'app ne s'ouvre pas / fenêtre force quit
 Cause fréquente : connexion MySQL impossible.
 Vérifiez :

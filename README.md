@@ -23,7 +23,7 @@ Application desktop de gestion de billetterie (client lourd) avec:
 ## Prerequis
 - Java 17 ou plus
 - Maven
-- Docker (si tu heberges MySQL en conteneur)
+- Docker (si vous hebergez MySQL en conteneur)
 
 ## Configuration `.env`
 Le projet lit d'abord les variables d'environnement systeme, puis `.env`.
@@ -39,9 +39,9 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_STARTTLS=true
 SMTP_SSL=false
-SMTP_USER=ton_email@gmail.com
+SMTP_USER=votre_email@gmail.com
 SMTP_PASS=mot_de_passe_app
-SMTP_FROM=ton_email@gmail.com
+SMTP_FROM=votre_email@gmail.com
 SMTP_TIMEOUT_MS=60000
 ```
 
@@ -55,7 +55,7 @@ mysql -u root -p < docker/init-auth.sql
 ```
 
 ### Option B - MySQL dans Docker sur serveur distant (AWS)
-Depuis ta machine locale:
+Depuis votre machine locale:
 
 ```bash
 cd ".../Clientlourdv2"
@@ -82,8 +82,8 @@ ssh -i "$HOME/Downloads/Clientlourd.pem" -N -L 3307:127.0.0.1:3306 admin@13.60.2
 ```
 
 Terminal B:
-- garde `DB_URL` sur `127.0.0.1:3307` dans `.env`
-- lance `./run-local.sh`
+- gardez `DB_URL` sur `127.0.0.1:3307` dans `.env`
+- lancez `./run-local.sh`
 
 ## Compte admin de demonstration
 Compte par defaut non personnel:

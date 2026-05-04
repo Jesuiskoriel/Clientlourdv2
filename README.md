@@ -1,9 +1,9 @@
 # Projet Client Lourd - Billetterie (JavaFX)
 
-Application desktop de gestion de billetterie (client lourd) avec:
+Application desktop de gestion de billetterie (client lourd) avec :
 - authentification (inscription/connexion)
 - OTP par email (si SMTP configuré)
-- espace admin (gestion clients/evenements/billets/comptes)
+- espace admin (gestion clients/événements/billets/comptes)
 - espace utilisateur (achat de billets, historique, solde fictif)
 
 ## Stack technique
@@ -11,24 +11,24 @@ Application desktop de gestion de billetterie (client lourd) avec:
 - JavaFX
 - MySQL 8
 - Maven
-- Docker (pour la base de donnees)
+- Docker (pour la base de données)
 
 ## Arborescence utile
 - `src/` : code source Java/JavaFX
-- `basededonnees/` : scripts SQL (schema + donnees)
-- `docker/init-auth.sql` : tables auth + compte admin de demo
+- `basededonnees/` : scripts SQL (schéma + données)
+- `docker/init-auth.sql` : tables d'authentification + compte admin de démo
 - `run-local.sh` : lancement local rapide
 - `pom.xml` : build Maven
 
-## Prerequis
+## Prérequis
 - Java 17 ou plus
 - Maven
-- Docker (si vous hebergez MySQL en conteneur)
+- Docker (si vous hébergez MySQL en conteneur)
 
 ## Configuration `.env`
-Le projet lit d'abord les variables d'environnement systeme, puis `.env`.
+Le projet lit d’abord les variables d’environnement système, puis `.env`.
 
-Exemple minimal:
+Exemple minimal :
 
 ```env
 DB_URL=jdbc:mysql://127.0.0.1:3307/billeterie?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
@@ -45,7 +45,7 @@ SMTP_FROM=votre_email@gmail.com
 SMTP_TIMEOUT_MS=60000
 ```
 
-## Initialiser la base de donnees
+## Initialiser la base de données
 
 ### Option A - depuis un serveur MySQL local
 
@@ -55,7 +55,7 @@ mysql -u root -p < docker/init-auth.sql
 ```
 
 ### Option B - MySQL dans Docker sur serveur distant (AWS)
-Depuis votre machine locale:
+Depuis votre machine locale :
 
 ```bash
 cd ".../Clientlourdv2"
@@ -72,63 +72,63 @@ ssh -i "$KEY" admin@"$IP_EC2" "sudo docker exec -i billetterie-mysql mysql -uroo
 ./run-local.sh
 ```
 
-## Mode de connexion AWS recommande (tunnel SSH)
-Si le port MySQL `3306` n'est pas ouvert publiquement, cree un tunnel:
+## Mode de connexion AWS recommandé (tunnel SSH)
+Si le port MySQL `3306` n'est pas ouvert publiquement, créez un tunnel :
 
-Terminal A:
+Terminal A :
 
 ```bash
 ssh -i "$HOME/Downloads/Clientlourd.pem" -N -L 3307:127.0.0.1:3306 admin@13.60.24.212
 ```
 
-Terminal B:
+Terminal B :
 - gardez `DB_URL` sur `127.0.0.1:3307` dans `.env`
 - lancez `./run-local.sh`
 
-## Compte admin de demonstration
-Compte par defaut non personnel:
-- email: `admin.demo@billeterie.local`
-- mot de passe: `AdminDemo2026!`
+## Compte admin de démonstration
+Compte par défaut non personnel :
+- email : `admin.demo@billeterie.local`
+- mot de passe : `AdminDemo2026!`
 
-Ce compte est defini dans:
+Ce compte est défini dans :
 - `src/controllers/AuthController.java`
 - `docker/init-auth.sql`
 - `data.sql`
 
-## Generer le JAR de livraison
+## Générer le JAR de livraison
 
 ```bash
 mvn -DskipTests clean package
 cp target/clientlourdv2-1.0.0-all.jar target/billeterie.jar
 ```
 
-Lancer le jar:
+Lancer le jar :
 
 ```bash
 java -jar target/billeterie.jar
 ```
 
-## Depannage rapide
+## Dépannage rapide
 
-### L'app ne s'ouvre pas / fenetre force quit
-Cause frequente: connexion MySQL impossible.
-Verifie:
+### L'app ne s'ouvre pas / fenêtre force quit
+Cause fréquente : connexion MySQL impossible.
+Vérifiez :
 - tunnel SSH actif
 - `DB_URL` JDBC correct
 - identifiants DB corrects
 
 ### `Communications link failure`
-- MySQL non joignable (reseau/port)
-- utilise le tunnel SSH au lieu d'ouvrir `3306` publiquement
+- MySQL non joignable (réseau/port)
+- utilisez le tunnel SSH au lieu d'ouvrir `3306` publiquement
 
-### OTP non recu
-- verifier `SMTP_*`
-- utiliser un mot de passe d'application Gmail
+### OTP non reçu
+- vérifiez `SMTP_*`
+- utilisez un mot de passe d'application Gmail
 
-## Securite
+## Sécurité
 - ne jamais commiter `.env`
-- ne pas publier de credentials personnels
-- utiliser des comptes de demo pour les presentations
+- ne pas publier d’identifiants personnels
+- utiliser des comptes de démo pour les présentations
 
 ## Auteur
 Lajimi Jhawad - BTS SIO SLAM

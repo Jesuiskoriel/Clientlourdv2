@@ -26,14 +26,19 @@ Application desktop de gestion de billetterie (client lourd) avec :
 - Docker (si vous hébergez MySQL en conteneur)
 
 ## Configuration `.env`
-Le projet lit d’abord les variables d’environnement système, puis `.env`.
+Le projet lit les paramètres dans cet ordre :
+1. variables d’environnement système
+2. fichier `.env` local
+3. fallback embarqué dans le JAR (`src/app-defaults.properties`)
+
+Vous pouvez donc lancer le JAR sans `.env` pour une démo plug and play.
 
 Exemple minimal :
 
 ```env
 DB_URL=jdbc:mysql://13.60.24.212:3306/billeterie?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-DB_USER=root
-DB_PASSWORD=rootpass123
+DB_USER=billeterie_app
+DB_PASSWORD=MotDePasseFort!
 
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -63,6 +68,14 @@ mysql -u root -p < docker/init-auth.sql
 ./run-local.sh
 ```
 
+Lancer directement le JAR (sans autre commande) :
+
+```bash
+java -jar target/clientlourdv2-1.0.0-all.jar
+```
+
+Sous Windows, vous pouvez aussi lancer `run-windows.bat` (double-clic).
+
 ## Compte admin de démonstration
 Compte par défaut non personnel :
 - email : `admin.demo@billeterie.local`
@@ -78,6 +91,13 @@ Ce compte est défini dans :
 ```bash
 mvn -DskipTests clean package
 cp target/clientlourdv2-1.0.0-all.jar target/billeterie.jar
+```
+
+Build Windows dédié :
+
+```bash
+mvn -DskipTests -Djavafx.platform=win clean package
+cp target/clientlourdv2-1.0.0-all.jar target/billeterie-windows.jar
 ```
 
 Lancer le jar :
@@ -102,6 +122,7 @@ Vérifiez :
 ### OTP non reçu
 - vérifiez `SMTP_*`
 - utilisez un mot de passe d'application Gmail
+- en mode démo sans SMTP, l’OTP est contourné automatiquement (`OTP_BYPASS_WITHOUT_SMTP=true`)
 
 ## Sécurité
 - ne jamais commiter `.env`

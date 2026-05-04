@@ -16,3 +16,5 @@ lib/
 # Local VS Code launch config (contains secrets)
 .vscode/launch.json
 lib/
+
+.env

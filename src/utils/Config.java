@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.InputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,6 +8,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Lit la configuration depuis les variables d'environnement
@@ -15,6 +17,7 @@ import java.util.Map;
 public final class Config {
 
     private static final Map<String, String> FILE_ENV = loadDotEnv();
+    private static final Map<String, String> BUNDLED_DEFAULTS = loadBundledDefaults();
 
     private Config() {
     }
@@ -27,6 +30,10 @@ public final class Config {
         String fileValue = FILE_ENV.get(key);
         if (fileValue != null && !fileValue.isBlank()) {
             return fileValue;
+        }
+        String bundledValue = BUNDLED_DEFAULTS.get(key);
+        if (bundledValue != null && !bundledValue.isBlank()) {
+            return bundledValue;
         }
         return fallback;
     }
@@ -54,6 +61,26 @@ public final class Config {
             }
         } catch (IOException ignored) {
             // En cas d'échec de lecture, on garde uniquement l'environnement système.
+        }
+        return values;
+    }
+
+    private static Map<String, String> loadBundledDefaults() {
+        Map<String, String> values = new HashMap<>();
+        try (InputStream in = Config.class.getClassLoader().getResourceAsStream("app-defaults.properties")) {
+            if (in == null) {
+                return values;
+            }
+            Properties properties = new Properties();
+            properties.load(in);
+            for (String key : properties.stringPropertyNames()) {
+                String value = stripQuotes(properties.getProperty(key, "").trim());
+                if (!value.isBlank()) {
+                    values.put(key, value);
+                }
+            }
+        } catch (IOException ignored) {
+            // En cas d'échec de lecture, on garde uniquement .env et l'environnement système.
         }
         return values;
     }

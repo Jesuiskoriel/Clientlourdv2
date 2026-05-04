@@ -18,8 +18,9 @@ import javafx.stage.Stage;
 import model.Client;
 import model.SecurityQuestion;
 import model.User;
-import utils.PasswordUtils;
+import utils.Config;
 import utils.MailService;
+import utils.PasswordUtils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -73,6 +74,8 @@ public class AuthController {
     private final ClientDAO clientDAO = new ClientDAO();
     private final SecurityDAO securityDAO = new SecurityDAO();
     private final MailService mailService = new MailService();
+    private static final boolean OTP_BYPASS_WITHOUT_SMTP =
+            Boolean.parseBoolean(Config.get("OTP_BYPASS_WITHOUT_SMTP", "true"));
     private static final String ADMIN_EMAIL = "admin.demo@billeterie.local";
     private static final String ADMIN_PASSWORD = "AdminDemo2026!";
     private User pendingUserForOtp;
@@ -331,6 +334,10 @@ public class AuthController {
 
     // Génère et envoie un code OTP pour la 2FA.
     private void startTwoFactor(User user) {
+        if (!mailService.isEnabled() && OTP_BYPASS_WITHOUT_SMTP) {
+            finalizeLogin(user);
+            return;
+        }
         this.pendingUserForOtp = user;
         String code = String.format("%06d", new Random().nextInt(999999));
         LocalDateTime expiry = LocalDateTime.now().plusMinutes(10);

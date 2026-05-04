@@ -3,6 +3,7 @@ controllers/ClientController.class
 model/Achat.class
 App.class
 controllers/EventController.class
+utils/EventRecommendationService$ScoredEvenement.class
 dao/StatutBilletDAO.class
 controllers/AuthController.class
 dao/ClientDAO.class
@@ -12,10 +13,12 @@ model/Client.class
 model/StatutBillet.class
 model/Paiement.class
 dao/PaiementDAO.class
+utils/EventRecommendationService$UserProfile.class
 utils/Database.class
 controllers/StoreController.class
 dao/AchatDAO.class
 utils/MailService.class
+utils/EventRecommendationService.class
 controllers/MainSceneController.class
 utils/PasswordUtils.class
 model/SecurityQuestion.class

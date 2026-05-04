@@ -20,8 +20,10 @@
 /Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/model/SecurityQuestion.java
 /Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/model/Client.java
 /Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/dao/SecurityDAO.java
+/Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/utils/Config.java
 /Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/controllers/UserAdminController.java
 /Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/model/Evenement.java
 /Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/controllers/EventController.java
+/Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/utils/EventRecommendationService.java
 /Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/model/Achat.java
 /Users/jhawadlajimi/Documents/GitHub/Clientlourdv2/src/controllers/ClientController.java

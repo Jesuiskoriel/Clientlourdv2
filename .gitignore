@@ -12,4 +12,7 @@ posters/
 
 # JavaFX / local libs (avoid large binaries in git)
 lib/
+
+# Local VS Code launch config (contains secrets)
+.vscode/launch.json
 lib/

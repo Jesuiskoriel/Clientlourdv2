@@ -60,6 +60,8 @@
     <!-- Panneau latéral: achats + QR -->
     <right>
         <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: #f8f9fa;" prefWidth="320">
+            <Label text="Recommandés pour vous" style="-fx-font-weight: bold;"/>
+            <VBox fx:id="recommendationBox" spacing="10"/>
             <Label text="Mes billets 🎫" style="-fx-font-weight: bold;"/>
             <TableView fx:id="purchaseTable">
                 <columns>

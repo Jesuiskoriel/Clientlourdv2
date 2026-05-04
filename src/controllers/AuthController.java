@@ -73,8 +73,8 @@ public class AuthController {
     private final ClientDAO clientDAO = new ClientDAO();
     private final SecurityDAO securityDAO = new SecurityDAO();
     private final MailService mailService = new MailService();
-    private static final String ADMIN_EMAIL = "jhawadlajimi@hotmail.com";
-    private static final String ADMIN_PASSWORD = "lajimi04";
+    private static final String ADMIN_EMAIL = "admin.demo@billeterie.local";
+    private static final String ADMIN_PASSWORD = "AdminDemo2026!";
     private User pendingUserForOtp;
     private User resetTargetUser;
 
@@ -319,6 +319,16 @@ public class AuthController {
         securityDAO.saveSecurityAnswers(user.getId(), map);
     }
 
+    // Finalise la connexion après authentification complète.
+    private void finalizeLogin(User user) {
+        pendingUserForOtp = null;
+        if (user.isAdmin()) {
+            openMainScene();
+        } else {
+            openStoreScene(user);
+        }
+    }
+
     // Génère et envoie un code OTP pour la 2FA.
     private void startTwoFactor(User user) {
         this.pendingUserForOtp = user;
@@ -363,12 +373,7 @@ public class AuthController {
         }
         securityDAO.clearOtp(pendingUserForOtp.getId());
         User user = pendingUserForOtp;
-        pendingUserForOtp = null;
-        if (user.isAdmin()) {
-            openMainScene();
-        } else {
-            openStoreScene(user);
-        }
+        finalizeLogin(user);
     }
 
     // Regénère un nouveau code OTP.

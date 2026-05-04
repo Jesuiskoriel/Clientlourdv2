@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ButtonBar;
@@ -43,6 +44,7 @@ import javafx.scene.text.Font;
 import model.Achat;
 import model.Evenement;
 import model.User;
+import utils.EventRecommendationService;
 
 import java.io.IOException;
 import java.io.File;
@@ -63,6 +65,7 @@ public class StoreController {
     @FXML private TextField rechargeField;
 
     @FXML private FlowPane eventGrid;
+    @FXML private VBox recommendationBox;
 
     @FXML private TableView<Achat> purchaseTable;
     @FXML private TableColumn<Achat, String> purchaseEventColumn;
@@ -74,6 +77,7 @@ public class StoreController {
     private final UserDAO userDAO = new UserDAO();
     private final ObservableList<Evenement> events = FXCollections.observableArrayList();
     private final ObservableList<Achat> achats = FXCollections.observableArrayList();
+    private final ObservableList<Evenement> recommendedEvents = FXCollections.observableArrayList();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private User currentUser;
     private Evenement selectedEvent;
@@ -90,8 +94,8 @@ public class StoreController {
         this.currentUser = user;
         welcomeLabel.setText("Bonjour " + user.getNomComplet());
         updateBalanceLabel();
-        loadEvents();
         loadPurchases();
+        loadEvents();
     }
 
     // Configure les colonnes de la table des achats.
@@ -119,12 +123,14 @@ public class StoreController {
     private void loadEvents() {
         events.setAll(evenementDAO.findAll());
         renderEventCards();
+        refreshRecommendations();
     }
 
     // Charge les achats de l'utilisateur.
     private void loadPurchases() {
         if (currentUser != null) {
             achats.setAll(achatDAO.findByUser(currentUser.getId()));
+            refreshRecommendations();
         }
     }
 
@@ -237,6 +243,61 @@ public class StoreController {
             VBox card = createEventCard(event);
             eventGrid.getChildren().add(card);
         }
+    }
+
+    // Recalcule et affiche les recommandations personnalisees.
+    private void refreshRecommendations() {
+        if (recommendationBox == null) {
+            return;
+        }
+
+        recommendationBox.getChildren().clear();
+        recommendedEvents.setAll(EventRecommendationService.recommend(events, achats, 3));
+
+        if (recommendedEvents.isEmpty()) {
+            Label empty = new Label("Aucune recommandation pour le moment.");
+            empty.setStyle("-fx-text-fill: #6c757d;");
+            recommendationBox.getChildren().add(empty);
+            return;
+        }
+
+        for (Evenement event : recommendedEvents) {
+            recommendationBox.getChildren().add(createRecommendationCard(event));
+        }
+    }
+
+    // Cree une carte compacte pour les recommandations.
+    private VBox createRecommendationCard(Evenement event) {
+        Label badge = new Label("Pour vous");
+        badge.setStyle("-fx-background-color: #e7f5ff; -fx-text-fill: #1971c2; -fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 3 8 3 8; -fx-background-radius: 999;");
+
+        Label title = new Label(eventTitle(event));
+        title.setStyle("-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #1f2937;");
+        title.setWrapText(true);
+
+        Label meta = new Label(formatDate(event.getDateEvent(), event.getHeure()) + " • " + (event.getLieu() != null ? event.getLieu() : "Lieu à venir"));
+        meta.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 12;");
+        meta.setWrapText(true);
+
+        Label price = new Label(String.format("%.2f €", event.getPrixBase()));
+        price.setStyle("-fx-text-fill: #087f5b; -fx-font-weight: bold;");
+
+        Button chooseButton = new Button("Choisir");
+        chooseButton.setStyle("-fx-background-color: #364fc7; -fx-text-fill: white;");
+        chooseButton.setOnAction(e -> {
+            selectedEvent = event;
+            selectedCard = null;
+            feedbackLabel.setText("Recommandé sélectionné : " + eventTitle(event));
+            showAlert("Événement sélectionné", "L'événement recommandé a été sélectionné. Vous pouvez maintenant l'acheter.", Alert.AlertType.INFORMATION);
+        });
+
+        HBox footer = new HBox(10, price, chooseButton);
+        footer.setAlignment(Pos.CENTER_LEFT);
+
+        VBox card = new VBox(8, badge, title, meta, footer);
+        card.setPadding(new Insets(12));
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #dbe4ff; -fx-border-radius: 12;");
+        return card;
     }
 
     // Crée une carte visuelle pour un événement.

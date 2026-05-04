@@ -9,10 +9,12 @@ import java.sql.SQLException;
  */
 public final class Database {
 
-    private static final String URL = System.getenv()
-            .getOrDefault("DB_URL", "jdbc:mysql://localhost:3306/billeterie?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
-    private static final String USER = System.getenv().getOrDefault("DB_USER", "root");
-    private static final String PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", "");
+    private static final String URL = Config.get(
+            "DB_URL",
+            "jdbc:mysql://localhost:3306/billeterie?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+    );
+    private static final String USER = Config.get("DB_USER", "root");
+    private static final String PASSWORD = Config.get("DB_PASSWORD", "");
 
     private Database() {
     }

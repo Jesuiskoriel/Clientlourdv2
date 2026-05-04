@@ -55,6 +55,6 @@ INSERT INTO security_question (id, libelle) VALUES
 ON DUPLICATE KEY UPDATE libelle = VALUES(libelle);
 
 INSERT INTO utilisateur (prenom, nom, nom_complet, email, telephone, mot_de_passe, solde, is_admin)
-VALUES ('Administrateur', 'Administrateur', 'Administrateur', 'jhawadlajimi@hotmail.com', '0000000000',
-'63d5c90459c70cd1fc7d9372d0e60acd6e16b25fa8b83bb06291bc5957ab991c', 0, 1)
+VALUES ('Administrateur', 'Administrateur', 'Administrateur', 'admin.demo@billeterie.local', '0000000000',
+'5c5ca44169a9b3b64480c8635dca583ef4fe16454b35472685c1b7d44bc75ef9', 0, 1)
 ON DUPLICATE KEY UPDATE email = email;
